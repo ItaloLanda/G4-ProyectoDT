@@ -130,8 +130,12 @@ donde $D_k$ representa la desviación térmica sostenida en K, con una memoria a
 
 \textbf{Índice de salud operacional (IHO).} Cada indicador se convierte en un subíndice de 0 a 100 y el IHO se define por el subsistema en peor estado:
 \begin{equation}
-H_T = 100\left[1 - \min\!\left(\max\!\left(\frac{D_k}{12\,\mathrm{K}}, 0\right), 1\right)\right], \quad
-H_C = 100\left[1 - \min\left(\max\left(\Delta c, 0\right), 1\right)\right], \quad
+H_T = 100\left[1 - \min\!\left(\max\!\left(\frac{D_k}{12\,\mathrm{K}}, 0\right), 1\right)\right]
+\end{equation}
+\begin{equation}
+H_C = 100\left[1 - \min\left(\max\left(\Delta c, 0\right), 1\right)\right]
+\end{equation}
+\begin{equation}
 \mathrm{IHO} = \min(H_T, H_C)
 \end{equation}
 
@@ -146,10 +150,10 @@ Un nivel se confirma solo si se mantiene durante 6 horas continuas. La Tabla~\re
 \hline
 \textbf{Nivel} & \textbf{IHO} & \textbf{Desviación térmica} & \textbf{Aumento de ciclos} & \textbf{Acción recomendada} \\
 \hline
-Verde & $\geq 80$ & $< 2{,}4$\,K & $< 20\,\%$ & Operación dentro del patrón normal \\
+Verde & 80 o más & menos de 2,4\,K & menos de 20\,\% & Operación dentro del patrón normal \\
 Amarillo & 60--80 & 2,4--4,8\,K & 20--40\,\% & Revisar en la próxima ronda de mantenimiento \\
 Naranja & 40--60 & 4,8--7,2\,K & 40--60\,\% & Programar una inspección en un plazo definido \\
-Rojo & $< 40$ & $> 7{,}2$\,K & $> 60\,\%$ & Revisión prioritaria antes de que se produzca una parada \\
+Rojo & menos de 40 & más de 7,2\,K & más de 60\,\% & Revisión prioritaria antes de que se produzca una parada \\
 \hline
 \end{tabular}
 \end{table}
