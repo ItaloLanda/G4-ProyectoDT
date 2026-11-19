@@ -1,85 +1,33 @@
-\chapter{REVISIÓN CRÍTICA DE LA LITERATURA}
+% Capitulo I: Introduccion (borrador)
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec porta neque. Curabitur cursus aliquam metus, id porttitor libero semper vel. Mauris risus metus, ultricies ut massa vitae, dignissim rhoncus arcu. Nam vulputate id sapien nec lacinia. Mauris non tempor est. Nam eget nunc augue. Morbi tincidunt leo at sapien finibus facilisis. Nullam commodo erat non tempor dictum.
+\chapter{INTRODUCCIÓN}
 
-Duis convallis mauris eros. Interdum et malesuada fames ac ante ipsum primis in faucibus. Suspendisse et pellentesque tortor. Vivamus porttitor, lorem non interdum lacinia, ligula libero euismod diam, in commodo ipsum nibh a dui. Donec erat metus, suscipit quis suscipit at, condimentum et nunc. Phasellus ac felis euismod lectus mollis laoreet vel vehicula lorem. Quisque tincidunt turpis tempus odio tempus, vel interdum turpis auctor. Duis nec vulputate massa. Suspendisse egestas quis turpis non dictum. Proin et ultricies leo. Mauris posuere sagittis blandit. Pellentesque scelerisque rhoncus justo, nec interdum ante. Praesent finibus dictum lacus in pellentesque.
+\section{Presentación del tema de proyecto}
 
-Integer at lacus nisi. Proin eu elit mi. Proin interdum nulla vitae turpis tincidunt fermentum. Duis dui lorem, ornare vel metus sit amet, consequat lacinia ex. Cras ornare porta malesuada. Proin vehicula, velit a interdum malesuada, nulla diam accumsan urna, et efficitur ipsum mi id sapien. Vivamus accumsan aliquet leo ac interdum. Ut molestie purus a blandit ultricies. Aenean ornare eu mauris quis gravida. Nam molestie ullamcorper egestas. In hac habitasse platea dictumst. Nulla pulvinar orci tempor varius porttitor.
+El presente proyecto se ubica en el sector de los sistemas de aire comprimido de uso industrial. El aire comprimido es un servicio auxiliar presente en plantas de manufactura, minería, alimentos y otros rubros, donde se emplea para accionar válvulas, actuadores y herramientas neumáticas, así como en procesos de soplado y transporte. Un sistema de aire comprimido está conformado por equipos de generación, tratamiento y distribución, y su elemento principal es el compresor. En aplicaciones de potencia media son de uso extendido los compresores de tornillo rotativo lubricados de velocidad fija, que regulan la entrega de aire alternando entre los estados de carga y descarga dentro de una banda de presión \cite{liang2019}. Estos equipos suelen operar de forma continua y cuentan con un controlador electrónico que supervisa variables como presiones, temperaturas, horas de funcionamiento y alarmas. En ese contexto, la oportunidad que aborda el proyecto se ubica en la gestión del mantenimiento de estos compresores dentro de la operación industrial.
 
-\section{Sección 1}
+\section{Descripción de la situación problemática}
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras scelerisque quis augue malesuada porttitor. Phasellus tincidunt ipsum quis metus pellentesque commodo. Phasellus vitae metus arcu. Pellentesque scelerisque ac nulla laoreet mollis. Vivamus blandit, velit eget convallis eleifend, nibh risus congue sapien, tristique bibendum justo lorem eget arcu. Quisque mollis tristique tellus, sit amet hendrerit purus lacinia id. Fusce sed nunc arcu. Phasellus porttitor convallis ipsum, sit amet tempus nulla mattis a \cite{Reumann2012}.
+En una planta industrial, el compresor abastece de aire a válvulas, actuadores y equipos de producción. Si el compresor se detiene, estos equipos también se detienen, por lo que una falla no planificada se traduce en horas de producción perdidas. Las paradas asociadas al mantenimiento tienen un costo elevado: en la manufactura de Estados Unidos, las pérdidas por problemas de mantenimiento que pudieron evitarse alcanzaron USD 119\,100 millones en 2016, de los cuales USD 18\,100 millones correspondieron a tiempo de parada \cite{thomas2020nist}.
 
-Sed eu orci feugiat, mollis nunc convallis, lobortis lorem. Suspendisse in lacinia magna, vel elementum tortor. Suspendisse hendrerit commodo justo, vitae posuere nisl eleifend at. Morbi vehicula risus ut diam tempus, ac dapibus erat euismod. Nunc quis elementum mi, et dictum nulla. Mauris rhoncus diam ac orci laoreet lobortis. Fusce et augue efficitur, dignissim dui ac, convallis est.
+Una parte importante de estas fallas se relaciona con la forma de realizar el mantenimiento. En muchos casos, el compresor se interviene recién cuando presenta una alarma o se detiene (mantenimiento reactivo), o cada cierto número de horas, aunque sus componentes se encuentren en buen estado (mantenimiento preventivo por horas). En ambos casos se desconoce la condición real del equipo entre un servicio y otro. Por ello, los problemas que avanzan de forma gradual, como el aumento de la temperatura de operación o un número excesivo de ciclos de carga y descarga, pasan desapercibidos hasta que generan una alarma o una parada. Este punto es relevante porque la temperatura del aceite influye directamente en el desempeño del compresor \cite{kumar2022}.
 
+La evidencia muestra que esta forma de trabajo tiene consecuencias medibles. Los establecimientos que dependen más del mantenimiento reactivo registran 3,3 veces más tiempo de parada que los que dependen menos de él. En cambio, entre los establecimientos que priorizan el mantenimiento preventivo y predictivo, los que más utilizan el predictivo presentan 15\,\% menos tiempo de parada y 87\,\% menos defectos \cite{thomas2020nist}.
 
+El problema afecta principalmente a tres grupos. El área de mantenimiento planifica sus intervenciones sin conocer la condición del equipo; el área de producción asume las paradas no planificadas; y los proveedores de servicio técnico no cuentan con información suficiente para anticipar visitas y repuestos. Además, se presenta en plantas que operan de forma continua, con salas de compresores expuestas a cambios de temperatura ambiente y con personal técnico que no suele tener formación en análisis de datos.
 
-\section{Segundo subtítulo}
+En consecuencia, se requiere una solución técnica que permita conocer la condición del compresor mientras opera y que entregue esa información de forma simple al personal de planta. El problema admite distintas soluciones. Las de digitalización, como el monitoreo remoto de variables de operación, ya se aplican en compresores \cite{pinzaapolo2026}; sin embargo, es necesario definir qué variables vigilar y cómo convertir sus cambios en decisiones de mantenimiento.
 
-\subsection{División del segundo subtítulo}
+\section{Formulación del proyecto}
 
-En la actualidad, las unidades de información hacen frente a muchos cambios
-debido a los avances tecnológicos, explosión informativa, nuevos recursos y
-soportes, por lo cual se implementan servicios innovadores que les permitan a
-sus usuarios tener acceso a muchas fuentes de información. Para asegurar el
-acceso y uso de los servicios los usuarios requieren poseer una serie de
-habilidades que les permitan identificar, recuperar, manejar, discernir,
-organizar, utilizar y comunicar la información de manera eficaz para la toma de
-decisiones. La relación entre $a$ y $b$ puede expresarse como
-%
-\begin{equation}
-  \label{eq:1}
-  a+b=\sqrt{\frac{4}{3}},
-\end{equation}
-%
-donde $a$ y $b$ son escalares.
+Los compresores de tornillo de uso industrial suelen mantenerse sin información continua sobre su condición, lo que impide identificar a tiempo las desviaciones térmicas o de operación que anteceden a una falla. En ese sentido, el problema de ingeniería se formula de la siguiente manera: ¿cómo diseñar un sistema que anticipe anomalías operativas en compresores de tornillo industriales?
 
-Entre las causas se pueden considerar la falta de tiempo asignado al taller,
-las limitaciones en cuanto a laboratorios, el poco personal, la falta de una
-correcta selección de los contenidos, así como, una calificación que asegure el
-cumplimiento de los objetivos. Un ejemplo de cómo poner una figura se muestra en la Fig. \ref{fig:diagram2}, y es importante recordar la relación mostrada en \eqref{eq:1}.
+\section{Objetivo general del proyecto}
 
+Diseñar una sombra digital que evalúe la condición operativa de un compresor de tornillo lubricado de velocidad fija de 45\,kW mediante un índice de salud operacional.
 
-\begin{figure} 
-\begin{center}
-\begin{tabular}{cc}
-\includegraphics[height=3cm]{images/logo_utec.png} &
-\includegraphics[height=2cm]{images/logo_utec.png} \\
-(a) & (b)
-\end{tabular}
-\caption{\label{fig:diagram2}Scheme showing the architecture of a generic kinematic task. (a) Logo en tamaño de 3 centímetros. (b) Logo en tamaño de 2 centímetros.}
-\end{center}
-\end{figure}
+\section{Alcances del proyecto}
 
+El proyecto llega hasta la fase de diseño conceptual, complementada con una simulación en software. Se toma como caso de estudio un compresor de tornillo lubricado de velocidad fija de 45\,kW, con regulación por carga y descarga y controlador electrónico. Los entregables son los siguientes: la definición de los requerimientos y de las variables a supervisar; la arquitectura de la sombra digital, organizada por capas y basada en estándares abiertos de comunicación e intercambio de modelos; un modelo de comportamiento normal del compresor y la lógica de detección para dos escenarios, la anomalía térmica y el ciclaje excesivo de carga y descarga; el cálculo de un índice de salud operacional con niveles de alerta; y la simulación de ambos escenarios en MATLAB con datos sintéticos, junto con sus indicadores de desempeño.
 
-\section{Tercer subtítulo}
-
-\subsection{División del tercer subtítulo}
-
-En la actualidad, las unidades de información hacen frente a muchos cambios
-debido a los avances tecnológicos, explosión informativa, nuevos recursos y
-soportes, por lo cual se implementan servicios innovadores que les permitan a
-sus usuarios tener acceso a muchas fuentes de información. Para asegurar el
-acceso y uso de los servicios los usuarios requieren poseer una serie de
-habilidades que les permitan identificar, recuperar, manejar, discernir,
-organizar, utilizar y comunicar la información de manera eficaz para la toma de
-decisiones.
-
-Entre las causas se pueden considerar la falta de tiempo asignado al taller,
-las limitaciones en cuanto a laboratorios, el poco personal, la falta de una
-correcta selección de los contenidos, así como, una calificación que asegure el
-cumplimiento de los objetivos.
-
-\begin{table}[H]
-    \centering
-    \begin{tabular}{c|c}
-        Tiempo($s$) & Distancia($m$) \\
-        \hline
-        10 & 23 \\
-        20 & 33 \\
-        30 & 43 \\
-        40 & 53 \\
-    \end{tabular}
-    \caption{Tiempos versus distancia.}
-    \label{tab:tiempo_versus_distancia}
-\end{table}
+Quedan fuera del alcance la conexión a un equipo real y el uso de datos de operación de clientes, por lo que todos los datos empleados son sintéticos. La sombra digital no envía órdenes al controlador ni modifica sus protecciones; las alarmas y paradas siguen a cargo del equipo. Tampoco se incluyen la estimación de la vida útil remanente de los componentes, que se plantea como trabajo futuro; el resto del sistema de aire comprimido, como secadores, tanques y red de distribución, que se considera solo como entorno del compresor; la implementación de hardware; ni el análisis económico de detalle.

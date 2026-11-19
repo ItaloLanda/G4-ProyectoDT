@@ -1,23 +1,100 @@
-\chapter{MARCO METODOLÓGICO}
+% Capitulo IV: Resultados esperados (borrador)
+% Valores tomados de simulacion/resultados.txt (datos sinteticos)
 
-Inicie aquí el texto, utilizando sangría de 1.25 cm. en el primer
-párrafo. Continúe el segundo párrafo.
+\chapter{RESULTADOS ESPERADOS}
 
-Continúe el segundo párrafo
+Los resultados de este capítulo provienen de la simulación descrita en el Capítulo III y, por lo tanto, representan el desempeño esperado de la sombra digital con datos sintéticos. Su objetivo es demostrar que la solución es funcional, segura y coherente con el problema planteado, no reemplazar la validación con datos reales.
 
-\section{Primer subtítulo}
+\section{Desempeño del modelo de comportamiento normal}
 
-En la actualidad, las unidades de información hacen frente a muchos cambios
-debido a los avances tecnológicos, explosión informativa, nuevos recursos y
-soportes, por lo cual se implementan servicios innovadores que les permitan a
-sus usuarios tener acceso a muchas fuentes de información. Para asegurar el
-acceso y uso de los servicios los usuarios requieren poseer una serie de
-habilidades que les permitan identificar, recuperar, manejar, discernir,
-organizar, utilizar y comunicar la información de manera eficaz para la toma de
-decisiones.
+El modelo de la Ecuación~\ref{eq:modelo} se ajustó con los primeros 14 días de operación normal y se evaluó con los 46 días restantes. En la validación se obtuvo un $R^2$ de 0,963 y un RMSE de 1,11\,K (Figura~\ref{fig:modelo}). El residual se distribuye de forma simétrica alrededor de cero, lo que indica que el modelo no presenta un sesgo sistemático en operación normal. Con ello se cumple el requerimiento R8.
 
-Entre las causas se pueden considerar la falta de tiempo asignado al taller,
-las limitaciones en cuanto a laboratorios, el poco personal, la falta de una
-correcta selección de los contenidos, así como, una calificación que asegure el
-cumplimiento de los objetivos.
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig_modelo_normal.pdf}
+\caption{Validación del modelo de comportamiento normal}
+\label{fig:modelo}
+\end{figure}
 
+\section{Escenario 1: anomalía térmica}
+
+En la simulación representativa, la degradación del enfriamiento comenzó el día 30. La sombra digital confirmó el nivel amarillo el día 32,7, el naranja el día 35,6 y el rojo el día 38,4. El aviso por alta temperatura del controlador se activó recién el día 56,6, es decir, el nivel amarillo se anticipó 23,9 días al aviso del controlador (Figura~\ref{fig:termico}). La razón es que, en los primeros días, la temperatura máxima diaria seguía por debajo de los 110\,°C, pero ya era mayor que la esperada para las condiciones de operación de cada momento.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig_escenario_termico.pdf}
+\caption{Escenario térmico: temperatura máxima diaria y desviación sostenida}
+\label{fig:termico}
+\end{figure}
+
+En las 20 simulaciones con inicio entre los días 25 y 35 y una degradación final entre 20 y 35\,K, el nivel amarillo se confirmó en promedio 3,3 $\pm$ 0,6 días después del inicio de la falla y el rojo, 9,9 $\pm$ 1,6 días después. El aviso del controlador solo se alcanzó en 7 de las 20 simulaciones dentro del horizonte de 60 días; en ellas, la sombra digital se anticipó en promedio 22,8 $\pm$ 5,1 días. En las 13 simulaciones restantes, la degradación no llegó a activar el aviso del controlador, pero sí fue detectada por la sombra digital. Estos resultados cumplen el requerimiento R1.
+
+\section{Escenario 2: ciclaje excesivo}
+
+En la simulación representativa, la reducción del volumen útil comenzó el día 30 y elevó los ciclos de carga de 7,7 a 17,4 por hora al final del horizonte. La sombra digital confirmó el nivel amarillo el día 41,4, cuando el aumento sostenido alcanzó el 20\,\%, y el rojo el día 51,2 (Figura~\ref{fig:ciclaje}). En las 20 simulaciones, el nivel amarillo se confirmó en promedio 10,9 $\pm$ 2,0 días después del inicio y el rojo, 24,7 $\pm$ 4,1 días después. La detección es más lenta que en el escenario térmico porque el aumento de ciclos es gradual al inicio. Este escenario no genera ningún aviso en el controlador, de modo que la sombra digital aporta información que hoy no está disponible para el personal. Con ello se cumple el requerimiento R2.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig_escenario_ciclaje.pdf}
+\caption{Escenario de ciclaje: ciclos de carga por hora y aumento relativo}
+\label{fig:ciclaje}
+\end{figure}
+
+\section{Índice de salud operacional}
+
+La Figura~\ref{fig:iho} compara el IHO en las tres simulaciones. En operación normal, el índice se mantuvo en verde durante todo el horizonte, con valores entre 94 y 100. En ambos escenarios de falla, el índice descendió de forma progresiva a través de los cuatro niveles, lo que permite al personal priorizar la intervención según la gravedad. En las 20 simulaciones de operación normal no se registró tiempo fuera del nivel verde.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig_iho.pdf}
+\caption{Índice de salud operacional en operación normal y en los dos escenarios}
+\label{fig:iho}
+\end{figure}
+
+\section{Robustez y limitaciones}
+
+El resultado de cero falsas alarmas se explica porque los datos sintéticos siguen la misma estructura que el modelo. Para estimar el comportamiento ante condiciones reales, se agregó a la temperatura medida un efecto térmico lento que el modelo no conoce, como el que podrían producir la humedad, equipos cercanos o un sensor descalibrado (Tabla~\ref{tab:robustez}).
+
+\begin{table}[htbp]
+\centering
+\caption{Prueba de robustez frente a efectos térmicos no modelados (10 simulaciones por nivel)}
+\label{tab:robustez}
+\small
+\begin{tabular}{ccc}
+\hline
+\textbf{Perturbación no modelada (K)} & \textbf{Tiempo fuera de verde sin falla} & \textbf{Detección de la falla térmica} \\
+\hline
+0 & 0,0\,\% & 10 de 10 \\
+1 & 0,0\,\% & 10 de 10 \\
+2 & 3,8\,\% & 10 de 10 \\
+3 & 12,4\,\% & 10 de 10 \\
+\hline
+\end{tabular}
+\end{table}
+
+Con perturbaciones de hasta 2\,K, el tiempo fuera de verde sin falla se mantiene por debajo del 5\,\%, por lo que se cumple el requerimiento R3. Con 3\,K, en cambio, el índice genera alertas sin causa durante el 12,4\,\% del tiempo. En consecuencia, en una implementación real los umbrales deberán calibrarse con datos del equipo, y podría ser necesario incorporar otras variables al modelo, como la temperatura del aceite o la humedad. Otras limitaciones son el uso de parámetros supuestos, la ausencia de validación con datos reales y la representación simplificada de las fallas mediante degradaciones lineales.
+
+\section{Cumplimiento de requerimientos}
+
+La Tabla~\ref{tab:cumplimiento} resume el cumplimiento de los requerimientos definidos en el Capítulo III.
+
+\begin{table}[htbp]
+\centering
+\caption{Cumplimiento de requerimientos}
+\label{tab:cumplimiento}
+\small
+\begin{tabular}{p{0.7cm}p{5.2cm}p{5.6cm}p{1.4cm}}
+\hline
+\textbf{ID} & \textbf{Criterio} & \textbf{Resultado esperado} & \textbf{Estado} \\
+\hline
+R1 & Anticipación mínima de 7 días & 22,8 $\pm$ 5,1 días frente al aviso del controlador & Cumple \\
+R2 & Alerta ante un aumento de ciclos de 20\,\% & Amarillo confirmado al superar el 20\,\% & Cumple \\
+R3 & Menos del 5\,\% del tiempo fuera de verde sin falla & 0\,\% con datos ideales; 3,8\,\% con 2\,K de perturbación & Cumple con calibración \\
+R4 & Acceso de solo lectura & La arquitectura no envía órdenes al controlador & Cumple por diseño \\
+R5 & Índice de 0 a 100 con cuatro niveles & IHO con semáforo y acción recomendada & Cumple \\
+R6 & Sin sensores adicionales & Solo variables del controlador & Cumple por diseño \\
+R7 & Estándares abiertos & OPC UA y FMI en la arquitectura propuesta & Propuesto \\
+R8 & RMSE de validación menor a 2\,K & 1,11\,K & Cumple \\
+\hline
+\end{tabular}
+\end{table}

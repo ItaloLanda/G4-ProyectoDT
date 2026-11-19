@@ -15,7 +15,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[square, numbers, comma, sort&compress]{natbib}
 % Libreria de idioma
-\usepackage[spanish]{babel}
+\usepackage[spanish,es-noshorthands,es-tabla]{babel}
 % Libreria para posicionamiento
 \usepackage{float}
 % Librerias para insertar codigos
@@ -28,7 +28,7 @@
 
 % Incluir acá los paquetes adicionales que deseas. 
 % Ubicación de los imágenes.
-\graphicspath{images/}
+\graphicspath{{images/}}
 
 \makeatletter
 % Reinsert missing \algbackskip
@@ -41,24 +41,24 @@
 
 \frontmatter
 
-\department{...}
-\degree{... }
-\major{...}
+\department{Curso de especialización}
+\degree{Proyecto final}
+\major{Simulación y gemelos digitales}
 
-\title{TÍTULO DEL TRABAJO DE INVESTIGACIÓN}
+\title{DISEÑO DE UNA SOMBRA DIGITAL PARA LA SUPERVISIÓN DE CONDICIÓN DE COMPRESORES DE TORNILLO LUBRICADOS}
 
-\author{Nombres y apellidos del alumno \orcid{0000-0000-0000-0000}} % Es obligatorio agregar ORCID del alumno
+uthor{Grupo 4: [Integrante 1], [Integrante 2], [Integrante 3], [Integrante 4]}
 \supervisor{Sergio Aranda Egusquiza \orcid{0000-0000-0000-0000}} % Es obligatorio agregar ORCID del asesor
 
-\date{2022}
+\date{2026}
 
 \maketitle
 
 \setstretch{1.5}
 
 
-\input{encabezados/dedicatoria}
-\input{encabezados/agradecimientos}
+%\input{encabezados/dedicatoria}
+%\input{encabezados/agradecimientos}
 
 \tableofcontents
 
@@ -76,15 +76,15 @@
 \mainmatter
 \pagestyle{fancy}
 
-\input{secciones/resumen}
-\input{secciones/abstract} 
-\input{secciones/introduccion}
+%\input{secciones/resumen}
+%\input{secciones/abstract} 
+%\input{secciones/introduccion}
 \input{secciones/capitulo1}
 \input{secciones/capitulo2}
 \input{secciones/capitulo3}
 \input{secciones/capitulo4}
-\input{secciones/conclusiones}
-\input{secciones/recomendaciones} % sección opcional
+%\input{secciones/conclusiones}
+%\input{secciones/recomendaciones} % sección opcional
 
 %% ============================================================================
 \renewcommand{\bibname}{\hfill\Large\bf{REFERENCIAS BIBLIOGRÁFICAS}\hfill}
@@ -93,6 +93,6 @@
 
 \bibliography{referencias} % Recibe las referencias de IEEE
 
-\input{secciones/anexos}
+%\input{secciones/anexos}
 
 \end{document}
