@@ -299,8 +299,8 @@
       \vspace{0.5cm}
       {\Large \bf \@title \par}
       \vspace{1.5cm}
-      {\large \textbf{TRABAJO DE INVESTIGACIÓN}\par}
-      {\large Para optar el grado de \degreename  en \majorname \par}
+      {\large \textbf{PROYECTO FINAL}\par}
+      {\large Curso de especialización en \majorname \par}
       \vfill
       \smallskip
       \vspace{0.5cm}
