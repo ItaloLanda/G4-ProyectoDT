@@ -1,132 +1,203 @@
-% Capitulo III: Marco metodologico (borrador, 5-10 paginas)
-% Figuras en la carpeta figuras/ (generadas por simulacion/main_simulacion.m y diagramas.py)
-
 \chapter{MARCO METODOLÓGICO}
 
 \section{Marco referencial de metodologías aplicadas}
 
-El desarrollo de la solución sigue el modelo en V de la directriz VDI 2206, propuesto para sistemas mecatrónicos y ciberfísicos \cite{vdi2206,graessler2020}. En su rama descendente se definen los requerimientos, se diseña el sistema y se detalla cada dominio; en su rama ascendente se integran los componentes y se verifica y valida la solución frente a los requerimientos iniciales. Para el tratamiento de los datos de monitoreo se adopta la secuencia de la norma ISO 13374 \cite{iso13374}, que ordena el procesamiento en adquisición, manipulación, detección de estado, evaluación de salud y generación de recomendaciones. La arquitectura se organiza por capas, tomando como referencia el marco de la ISO 23247 \cite{iso23247}. La Figura~\ref{fig:marco} muestra la relación entre estas metodologías, las herramientas empleadas y los indicadores de evaluación.
+La Figura~\ref{fig:marco} muestra la ruta metodológica del proyecto. En primer lugar, el problema se diagnostica con un diagrama de Ishikawa, del cual se derivan los requerimientos. Luego, la solución se desarrolla con el modelo en V de la directriz VDI 2206 \cite{vdi2206,graessler2020}. En la etapa de diseño del sistema se aplica una matriz morfológica con evaluación ponderada según la lógica de la VDI 2225; en el diseño por dominio se definen los datos, los modelos y la analítica; y el software se desarrolla mediante una metodología incremental. La integración se organiza con el marco PSAF del Digital Twin Consortium \cite{dtc_psaf} y con los niveles de la norma IEC 62264 (ISA-95) \cite{iec62264}. Finalmente, la solución se evalúa con la tabla periódica de capacidades \cite{dtc_cpt}, el nivel de madurez tecnológica \cite{iso16290} y los indicadores de desempeño de la simulación.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{fig_marco_metodologico.pdf}
-\caption{Marco metodológico del proyecto}
+\includegraphics[width=\textwidth]{fig_marco_metodologico_v2.pdf}
+\caption{Marco referencial de metodologías aplicadas}
 \label{fig:marco}
 \end{figure}
 
-Cada etapa del modelo en V se desarrolla en las secciones siguientes: los requerimientos en la Sección~\ref{sec:req}, el diseño del sistema y la selección de la alternativa en las Secciones~\ref{sec:alt} y~\ref{sec:arq}, el diseño por dominio en las Secciones~\ref{sec:var} a~\ref{sec:iho}, la integración mediante simulación en la Sección~\ref{sec:sim} y la verificación y validación en la Sección~\ref{sec:vv}.
+\section{Diagnóstico del problema}
+
+El diagrama de Ishikawa de la Figura~\ref{fig:ishikawa} ordena las causas de las paradas no planificadas por degradación no detectada del compresor. Las causas con mayor relación con el proyecto son tres: el método de mantenimiento, reactivo o por horas fijas; la medición, ya que los datos del controlador se usan principalmente para alarmas por umbral; y la máquina, en la que la degradación del enfriamiento y el aumento del ciclaje avanzan de forma gradual. Estas causas orientan la solución hacia el uso de los datos que ya registra el controlador para comparar la operación con un comportamiento de referencia.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig_ishikawa.pdf}
+\caption{Diagrama de Ishikawa del problema}
+\label{fig:ishikawa}
+\end{figure}
 
 \section{Requerimientos de la solución}
-\label{sec:req}
 
-Los requerimientos se obtuvieron a partir de las necesidades de los grupos de interés identificados en la situación problemática. La Tabla~\ref{tab:req} los presenta junto con el criterio con el que se verificará su cumplimiento.
+A partir del diagnóstico y de los grupos de interés identificados en el Capítulo I se definieron los requerimientos de la Tabla~\ref{tab:req}.
 
 \begin{table}[htbp]
 \centering
-\caption{Requerimientos de la sombra digital}
+\caption{Requerimientos de la plataforma}
 \label{tab:req}
 \small
-\begin{tabular}{p{0.7cm}p{2.4cm}p{5.6cm}p{4.2cm}}
+\begin{tabular}{p{0.7cm}p{2.3cm}p{5.6cm}p{4.2cm}}
 \hline
 \textbf{ID} & \textbf{Grupo de interés} & \textbf{Requerimiento} & \textbf{Criterio de verificación} \\
 \hline
 R1 & Mantenimiento & Detectar desviaciones térmicas antes del aviso por alta temperatura del controlador & Anticipación mínima de 7 días \\
 R2 & Mantenimiento & Detectar un aumento sostenido de los ciclos de carga y descarga & Alerta ante un aumento sostenido de 20\,\% \\
-R3 & Producción & Evitar alertas innecesarias que generen intervenciones sin causa & Menos del 5\,\% del tiempo fuera de verde sin falla \\
+R3 & Producción & Evitar alertas sin causa que generen intervenciones innecesarias & Menos del 5\,\% del tiempo fuera de verde sin falla \\
 R4 & Operación y seguridad & No interferir con el control ni con las protecciones del compresor & Acceso de solo lectura al controlador \\
-R5 & Mantenimiento & Presentar la información de forma comprensible para el personal técnico & Índice de 0 a 100 con cuatro niveles y acción recomendada \\
+R5 & Mantenimiento & Presentar la información de forma comprensible & Índice de 0 a 100 con cuatro niveles, causa probable y acción recomendada \\
 R6 & Proveedor de servicio & Utilizar las variables que ya registra el controlador & Sin sensores adicionales \\
-R7 & Proveedor de servicio & Permitir el uso del modelo y los datos en distintas herramientas & Uso de estándares abiertos (OPC UA, FMI) \\
-R8 & Mantenimiento & Contar con un modelo de referencia confiable & RMSE de validación menor a 2\,K \\
+R7 & Proveedor de servicio & Aplicarse a distintos equipos de la misma familia sin modificar el código & Dos configuraciones con el mismo código \\
+R8 & Proveedor de servicio & Ajustarse a cada equipo con su propio histórico & Calibración con 14 días de datos \\
+R9 & Mantenimiento & Contar con un modelo de referencia confiable & RMSE de validación menor a 2\,K \\
+R10 & Proveedor de servicio & Permitir el uso de los datos y modelos en distintas herramientas & Uso de estándares abiertos (OPC UA, FMI) \\
 \hline
 \end{tabular}
 \end{table}
 
-\section{Alternativas de solución y selección}
-\label{sec:alt}
+\section{Diseño del sistema y selección de la solución}
 
-Se evaluaron cuatro alternativas que responden a la formulación del problema. La primera (A1) consiste en inspecciones periódicas con instrumentos portátiles. La segunda (A2) es un monitoreo remoto con alarmas por umbrales fijos, similar al reportado por Pinza Apolo et al.~\cite{pinzaapolo2026}. La tercera (A3) es una sombra digital que compara la operación medida con un modelo de comportamiento normal y resume la condición en un índice de salud. La cuarta (A4) es un gemelo digital que, además, ajusta de forma automática las consignas del controlador.
-
-Los criterios y sus pesos se definieron a partir de los requerimientos. La capacidad de anticipación responde a R1 y R2; la seguridad operativa, a R4; la factibilidad con los datos disponibles, a R6; la facilidad de interpretación, a R5; y la complejidad de implementación, a R7. La Tabla~\ref{tab:decision} presenta la matriz de decisión, con puntajes de 1 (desfavorable) a 5 (favorable).
+Para generar alternativas se descompuso la plataforma en funciones y se plantearon opciones para cada una en una matriz morfológica (Tabla~\ref{tab:morfologica}). La combinación de opciones dio lugar a tres variantes de solución: V1, un monitoreo básico con exportación manual de datos y umbrales fijos; V2, una sombra digital configurable con gateway de borde, modelo de comportamiento normal y reglas expertas; y V3, un gemelo digital avanzado con modelo físico detallado, aprendizaje automático y acción automática sobre el controlador.
 
 \begin{table}[htbp]
 \centering
-\caption{Matriz de decisión ponderada}
-\label{tab:decision}
+\caption{Matriz morfológica de la plataforma}
+\label{tab:morfologica}
 \small
-\begin{tabular}{p{4.6cm}ccccc}
+\begin{tabular}{p{2.5cm}p{2.5cm}p{2.5cm}p{2.5cm}p{2.5cm}}
 \hline
-\textbf{Criterio} & \textbf{Peso} & \textbf{A1} & \textbf{A2} & \textbf{A3} & \textbf{A4} \\
+\textbf{Función} & \textbf{Opción 1} & \textbf{Opción 2} & \textbf{Opción 3} & \textbf{Opción 4} \\
 \hline
-Capacidad de anticipación & 0,30 & 2 & 3 & 5 & 5 \\
-Seguridad operativa & 0,20 & 5 & 5 & 5 & 2 \\
-Factibilidad con datos disponibles & 0,20 & 4 & 5 & 4 & 2 \\
-Facilidad de interpretación & 0,15 & 4 & 4 & 4 & 3 \\
-Complejidad de implementación & 0,15 & 3 & 4 & 3 & 1 \\
-\hline
-\textbf{Puntaje ponderado} & & \textbf{3,45} & \textbf{4,10} & \textbf{4,35} & \textbf{2,90} \\
+Adquisición de datos & Lectura manual en pantalla & Exportación periódica de archivos \textsuperscript{V1} & Gateway de borde por Ethernet \textsuperscript{V2, V3} & Sensores adicionales inalámbricos \\
+Almacenamiento & Hoja de cálculo \textsuperscript{V1} & Base de series de tiempo \textsuperscript{V2} & Nube con réplica \textsuperscript{V3} & -- \\
+Modelo de referencia & Umbrales fijos del fabricante \textsuperscript{V1} & Regresión de comportamiento normal \textsuperscript{V2} & Modelo termodinámico detallado \textsuperscript{V3} & Aprendizaje automático supervisado \textsuperscript{V3} \\
+Diagnóstico & Ninguno \textsuperscript{V1} & Reglas expertas \textsuperscript{V2} & Clasificador entrenado \textsuperscript{V3} & -- \\
+Configuración por equipo & Código por equipo \textsuperscript{V1} & Plantilla y archivo de configuración \textsuperscript{V2, V3} & -- & -- \\
+Presentación & Reporte periódico \textsuperscript{V1} & Índice con semáforo \textsuperscript{V2, V3} & Alarma en el controlador & -- \\
+Acción & Recomendación al personal \textsuperscript{V1, V2} & Ajuste automático del controlador \textsuperscript{V3} & -- & -- \\
 \hline
 \end{tabular}
 \end{table}
 
-La alternativa A3 obtuvo el mayor puntaje. Frente a A2, su ventaja está en la anticipación: un umbral fijo se activa cuando la variable ya alcanzó un valor anormal, mientras que el modelo de comportamiento normal detecta que la temperatura se aleja de lo esperado para las condiciones de operación, aunque todavía se encuentre dentro del rango permitido. La alternativa A4 se descartó porque modificar las consignas del controlador compromete la seguridad operativa y exige un modelo calibrado con datos reales que no se encuentran disponibles. De acuerdo con la clasificación de Kritzinger et al.~\cite{kritzinger2018}, la solución seleccionada corresponde a una sombra digital, ya que el flujo automático de datos va del compresor al modelo y las decisiones quedan a cargo del personal.
+Las variantes se evaluaron con criterios ponderados derivados de los requerimientos (Tabla~\ref{tab:vdi2225}). Siguiendo la lógica de la VDI 2225, el valor técnico de cada variante se calculó como el puntaje ponderado dividido entre el puntaje máximo posible:
+\begin{equation}
+x = \frac{\sum_{i} g_i\, p_i}{p_{max} \sum_{i} g_i}
+\end{equation}
+donde $g_i$ es el peso del criterio $i$, $p_i$ el puntaje de la variante en ese criterio y $p_{max} = 5$.
 
-\section{Arquitectura de la sombra digital}
-\label{sec:arq}
+\begin{table}[htbp]
+\centering
+\caption{Evaluación ponderada de las variantes}
+\label{tab:vdi2225}
+\small
+\begin{tabular}{p{5.0cm}cccc}
+\hline
+\textbf{Criterio} & \textbf{Peso} & \textbf{V1} & \textbf{V2} & \textbf{V3} \\
+\hline
+Capacidad de anticipación (R1, R2) & 0,30 & 2 & 5 & 5 \\
+Seguridad operativa (R4) & 0,20 & 5 & 5 & 2 \\
+Factibilidad con datos disponibles (R6, R8) & 0,20 & 5 & 4 & 2 \\
+Facilidad de interpretación (R5) & 0,15 & 4 & 4 & 3 \\
+Simplicidad de implementación (R7, R10) & 0,15 & 4 & 3 & 1 \\
+\hline
+\textbf{Valor técnico $x$} & & \textbf{0,76} & \textbf{0,87} & \textbf{0,58} \\
+\hline
+\end{tabular}
+\end{table}
 
-La arquitectura se organiza en seis capas (Figura~\ref{fig:arq}). La capa de activo físico corresponde al compresor y su controlador electrónico, basado en un softPLC. La capa de comunicación lee las variables del controlador en modo de solo lectura mediante OPC UA \cite{iec62541} o Modbus TCP, según la interfaz disponible; MATLAB cuenta con un cliente OPC UA en su Industrial Communication Toolbox. La capa de datos almacena el histórico en ventanas de 10 minutos y registra la calidad de cada dato. La capa de modelo contiene el modelo de comportamiento normal, que puede empaquetarse como unidad FMU según el estándar FMI para ejecutarse en otras herramientas \cite{blochwitz2012}. La capa de analítica calcula los indicadores y el índice de salud, y la capa de visualización los presenta en un tablero.
+La variante V2 obtuvo el mayor valor técnico. Frente a V1, su ventaja es la anticipación: un umbral fijo actúa cuando la variable ya alcanzó un valor anormal, mientras que el modelo de comportamiento normal detecta que la temperatura se aleja de lo esperado aunque todavía se encuentre dentro del rango permitido. La variante V3 se descartó porque actuar sobre el controlador compromete la seguridad operativa y porque sus modelos requieren datos reales de fallas que no se encuentran disponibles. De acuerdo con la clasificación de Kritzinger et al.~\cite{kritzinger2018}, la variante seleccionada corresponde a una sombra digital, ya que el flujo automático de datos va del compresor al modelo y las decisiones quedan a cargo del personal.
+
+\section{Arquitectura de la plataforma}
+
+La Figura~\ref{fig:isa95} ubica los componentes de la plataforma en los niveles de la norma IEC 62264 \cite{iec62264} y los relaciona con los elementos del PSAF \cite{dtc_psaf}. En el nivel 0 se encuentran el compresor y sus sensores; en el nivel 1, su controlador electrónico con pantalla, basado en un softPLC, que conserva la regulación, las alarmas y las paradas de protección. En el nivel 2, un gateway de borde lee las variables del controlador por Ethernet mediante Modbus TCP u OPC UA \cite{iec62541,morato2020}, almacena los datos de forma temporal y los envía a la plataforma. El nivel 3 contiene la plataforma de sombra digital, que corresponde a la representación virtual y a las interfaces de servicio del PSAF. El nivel 4 recibe las recomendaciones para la gestión del mantenimiento.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{fig_arquitectura.pdf}
-\caption{Arquitectura de la sombra digital por capas}
-\label{fig:arq}
+\includegraphics[width=\textwidth]{fig_arquitectura_isa95.pdf}
+\caption{Arquitectura de la plataforma según los niveles de ISA-95 y su correspondencia con el PSAF}
+\label{fig:isa95}
 \end{figure}
 
-\section{Variables supervisadas}
-\label{sec:var}
+La Tabla~\ref{tab:sincronizacion} describe el mecanismo de sincronización entre el compresor y su representación virtual, con las categorías del PSAF.
 
-Se seleccionaron variables que suelen estar disponibles en el controlador de un compresor de tornillo lubricado de velocidad fija, con el fin de cumplir el requerimiento R6 (Tabla~\ref{tab:variables}).
+\begin{table}[htbp]
+\centering
+\caption{Mecanismo de sincronización de la plataforma}
+\label{tab:sincronizacion}
+\small
+\begin{tabular}{p{3.2cm}p{3.0cm}p{6.6cm}}
+\hline
+\textbf{Característica} & \textbf{Tipo} & \textbf{Justificación} \\
+\hline
+Dirección & Unidireccional & Los datos van del compresor a la plataforma; no se envían órdenes al controlador \\
+Frecuencia & Discreta (10 min) & La degradación evoluciona en días, por lo que no se requiere tiempo real \\
+Nivel de detalle & Agregada & Se emplean promedios, fracción en carga y ciclos por ventana \\
+Alcance & Parcial & Solo se sincronizan las variables necesarias para los dos escenarios \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Diseño por dominio}
+
+\subsection{Datos y adquisición}
+
+Se seleccionaron variables que suelen estar disponibles en el controlador de un compresor de tornillo lubricado de velocidad fija (Tabla~\ref{tab:variables}). El gateway las lee cada pocos segundos y la plataforma las agrega en ventanas de 10 minutos. Para la calibración inicial, el gateway extrae el histórico de los últimos 14 días de operación.
 
 \begin{table}[htbp]
 \centering
 \caption{Variables supervisadas}
 \label{tab:variables}
 \small
-\begin{tabular}{p{4.2cm}p{1.6cm}p{7.2cm}}
+\begin{tabular}{p{4.6cm}p{1.6cm}p{6.8cm}}
 \hline
-\textbf{Variable} & \textbf{Unidad} & \textbf{Uso en la sombra digital} \\
+\textbf{Variable} & \textbf{Unidad} & \textbf{Uso en la plataforma} \\
 \hline
 Temperatura de salida del elemento & °C & Variable supervisada del escenario térmico \\
 Temperatura ambiente o de aspiración & °C & Entrada del modelo de comportamiento normal \\
-Presión de descarga & bar(g) & Entrada del modelo y control de la banda de presión \\
+Presión de descarga & bar(g) & Entrada del modelo y verificación de la banda \\
 Estado de carga o descarga & -- & Fracción de tiempo en carga y conteo de ciclos \\
 Horas de funcionamiento y en carga & h & Contexto de uso del equipo \\
-Avisos y paradas & -- & Comparación con las alertas de la sombra digital \\
+Avisos y paradas & -- & Comparación con las alertas de la plataforma \\
 \hline
 \end{tabular}
 \end{table}
 
-\section{Modelo de comportamiento normal}
-\label{sec:modelo}
+\subsection{Plantilla del modelo y configuración del equipo}
 
-La temperatura de salida del elemento depende de la temperatura ambiente, del tiempo que el compresor permanece en carga y de la presión de trabajo. A partir de esta relación física se plantea un modelo de regresión lineal, ajustado con los datos de un periodo de referencia de 14 días en condición normal:
+La plataforma contiene una plantilla para compresores de tornillo lubricados de velocidad fija, que reúne las variables, la estructura del modelo, los indicadores y las reglas expertas. Cada equipo se describe con un archivo de configuración que contiene sus datos nominales y los límites de su controlador. Así, el mismo código se aplica a distintos equipos cambiando solo este archivo. La Tabla~\ref{tab:config} muestra las dos configuraciones empleadas en la demostración.
+
+\begin{table}[htbp]
+\centering
+\caption{Configuraciones de los equipos de demostración (valores supuestos)}
+\label{tab:config}
+\small
+\begin{tabular}{p{6.4cm}p{3.0cm}p{3.0cm}}
+\hline
+\textbf{Parámetro} & \textbf{Compresor A} & \textbf{Compresor B} \\
+\hline
+Potencia & 45\,kW & 22\,kW \\
+Caudal en carga & 7,6\,m$^3$/min & 3,6\,m$^3$/min \\
+Banda de presión (carga / descarga) & 6,5 / 7,5\,bar(g) & 7,0 / 8,0\,bar(g) \\
+Volumen útil de tanque y red & 12\,m$^3$ & 5\,m$^3$ \\
+Aviso por alta temperatura & 110\,°C & 110\,°C \\
+Límite de ciclos por hora & 20 & 25 \\
+Temperatura media de la sala & 24\,°C & 28\,°C \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Calibración y modelo de comportamiento normal}
+
+La temperatura de salida del elemento depende de la temperatura ambiente, del tiempo que el compresor permanece en carga y de la presión de trabajo. A partir de esta relación se plantea un modelo de regresión lineal, cuyos coeficientes se calibran de forma automática con el histórico de cada equipo:
 \begin{equation}
 \hat{T}_e = \beta_0 + \beta_1\,T_{amb} + \beta_2\,FC + \beta_3\,p
 \label{eq:modelo}
 \end{equation}
-donde $\hat{T}_e$ es la temperatura esperada en °C, $T_{amb}$ la temperatura ambiente en °C, $FC$ la fracción de tiempo en carga en la ventana de 10 minutos y $p$ la presión media en bar(g). Con los datos sintéticos se obtuvo $\hat{T}_e = 31{,}44 + 1{,}030\,T_{amb} + 12{,}98\,FC + 1{,}47\,p$. El coeficiente de la temperatura ambiente, cercano a 1, es coherente con el hecho de que el incremento de temperatura en la compresión se suma a la temperatura de entrada. Se eligió una regresión lineal por ser fácil de explicar al personal de planta y por no requerir datos de fallas, a diferencia de los enfoques basados en aprendizaje automático \cite{talbi2026,daoudi2025}.
+donde $\hat{T}_e$ es la temperatura esperada en °C, $T_{amb}$ la temperatura ambiente en °C, $FC$ la fracción de tiempo en carga en la ventana de 10 minutos y $p$ la presión media en bar(g). Se eligió una regresión lineal por ser fácil de explicar al personal de planta y por no requerir datos de fallas, a diferencia de los enfoques basados en aprendizaje automático \cite{talbi2026,daoudi2025}.
 
-\section{Indicadores e índice de salud operacional}
-\label{sec:iho}
+\subsection{Indicadores, reglas expertas e índice de salud}
 
-\textbf{Escenario térmico.} En cada ventana se calcula el residual $r_k = T_{e,k} - \hat{T}_{e,k}$. Para evitar alertas por variaciones puntuales, el residual se suaviza con un promedio móvil exponencial (EWMA):
+\textbf{Escenario térmico.} En cada ventana se calcula el residual $r_k = T_{e,k} - \hat{T}_{e,k}$, que se suaviza con un promedio móvil exponencial (EWMA) para evitar alertas por variaciones puntuales:
 \begin{equation}
 D_k = \lambda\, r_k + (1-\lambda)\, D_{k-1}, \qquad \lambda = 0{,}02
 \end{equation}
-donde $D_k$ representa la desviación térmica sostenida en K, con una memoria aproximada de ocho horas.
+donde $D_k$ es la desviación térmica sostenida en K, con una memoria aproximada de ocho horas.
 
-\textbf{Escenario de ciclaje.} Se cuentan los ciclos de carga por hora y se suavizan con un EWMA ($\lambda = 0{,}05$ por hora). El indicador es el aumento relativo respecto a la media del periodo de referencia, $\Delta c = \bar{c}/c_{ref} - 1$.
+\textbf{Escenario de ciclaje.} Se cuentan los ciclos de carga por hora y se suavizan con un EWMA ($\lambda = 0{,}05$ por hora). El indicador es el aumento relativo respecto a la media del periodo de calibración, $\Delta c = \bar{c}/c_{ref} - 1$.
 
 \textbf{Índice de salud operacional (IHO).} Cada indicador se convierte en un subíndice de 0 a 100 y el IHO se define por el subsistema en peor estado:
 \begin{equation}
@@ -139,14 +210,14 @@ H_C = 100\left[1 - \min\left(\max\left(\Delta c, 0\right), 1\right)\right]
 \mathrm{IHO} = \min(H_T, H_C)
 \end{equation}
 
-Un nivel se confirma solo si se mantiene durante 6 horas continuas. La Tabla~\ref{tab:semaforo} muestra la correspondencia entre el IHO, el valor físico de cada indicador y la acción recomendada. Las acciones son recomendaciones para el personal; las alarmas y paradas de protección siguen a cargo del controlador.
+Un nivel se confirma solo si se mantiene durante 6 horas continuas (Tabla~\ref{tab:semaforo}). Además, una base de reglas expertas asocia el síntoma dominante con sus causas probables y con una acción recomendada (Tabla~\ref{tab:reglas}), y verifica los límites del archivo de configuración, como la cercanía al aviso por temperatura o el exceso de ciclos por hora. Las alarmas y paradas de protección siguen a cargo del controlador.
 
 \begin{table}[htbp]
 \centering
 \caption{Niveles del índice de salud operacional}
 \label{tab:semaforo}
 \small
-\begin{tabular}{p{1.6cm}p{1.4cm}p{2.0cm}p{2.0cm}p{6.0cm}}
+\begin{tabular}{p{1.6cm}p{1.4cm}p{2.1cm}p{2.1cm}p{5.6cm}}
 \hline
 \textbf{Nivel} & \textbf{IHO} & \textbf{Desviación térmica} & \textbf{Aumento de ciclos} & \textbf{Acción recomendada} \\
 \hline
@@ -158,48 +229,60 @@ Rojo & menos de 40 & más de 7,2\,K & más de 60\,\% & Revisión prioritaria ant
 \end{tabular}
 \end{table}
 
-\section{Generación de datos sintéticos}
-\label{sec:sim}
-
-Debido a que no se cuenta con datos reales, la integración se realizó con datos sintéticos generados en MATLAB. El modelo de simulación representa la presión de la red con la regulación por carga y descarga, y la temperatura de salida del elemento como un sistema de primer orden:
-\begin{equation}
-\frac{dp}{dt} = \frac{p_{atm}\,(Q_c - Q_d)}{60\,V}, \qquad
-\frac{dT_e}{dt} = \frac{T_{ss} - T_e}{\tau}
-\end{equation}
-donde $Q_c$ es el caudal del compresor (7,6\,m$^3$/min en carga y 0 en descarga), $Q_d$ la demanda de la planta, $V$ el volumen útil de tanque y red, $T_{ss}$ la temperatura de equilibrio en el estado actual y $\tau$ la constante de tiempo. El compresor pasa a carga a 6,5\,bar(g) y a descarga a 7,5\,bar(g). La demanda sigue un perfil de turnos con variación aleatoria, y la temperatura ambiente, un ciclo diario. La Tabla~\ref{tab:param} resume los principales parámetros, todos ellos supuestos.
-
 \begin{table}[htbp]
 \centering
-\caption{Parámetros supuestos de la simulación}
-\label{tab:param}
+\caption{Base de reglas expertas de la plantilla}
+\label{tab:reglas}
 \small
-\begin{tabular}{p{7.4cm}p{3.4cm}}
+\begin{tabular}{p{3.4cm}p{5.4cm}p{4.2cm}}
 \hline
-\textbf{Parámetro} & \textbf{Valor} \\
+\textbf{Síntoma} & \textbf{Causas probables} & \textbf{Acción recomendada} \\
 \hline
-Caudal en carga & 7,6\,m$^3$/min \\
-Banda de presión (carga / descarga) & 6,5 / 7,5\,bar(g) \\
-Volumen útil de tanque y red & 12\,m$^3$ \\
-Incremento de temperatura en carga / descarga & 55 / 38\,K \\
-Constante de tiempo en carga / descarga & 300 / 600\,s \\
-Aviso del controlador por alta temperatura & 110\,°C \\
-Demanda en producción / noche / fin de semana & 70 / 35 / 30\,\% del caudal \\
-Temperatura ambiente media y amplitud diaria & 24\,°C y 5\,K \\
-Paso de simulación y horizonte & 10\,s y 60 días \\
+Temperatura del elemento mayor a la esperada & Enfriador sucio u obstruido; ventilación insuficiente; nivel o estado del aceite inadecuado; falla de la válvula termostática & Inspeccionar enfriador, ventilación y aceite \\
+Aumento sostenido de ciclos de carga y descarga & Volumen útil reducido por condensado; banda de presión estrecha; cambio en la demanda de la planta & Revisar el purgador del tanque y la banda de presión \\
 \hline
 \end{tabular}
 \end{table}
 
-Se simularon dos escenarios de degradación gradual a partir del día 30. En el escenario térmico, el incremento de temperatura crece de forma lineal hasta 30\,K al día 60, lo que representa la pérdida progresiva de capacidad del enfriador. En el escenario de ciclaje, el volumen útil se reduce de 12 a 5\,m$^3$, como ocurriría con la acumulación de condensado en el tanque. La Figura~\ref{fig:operacion} muestra un día de operación normal simulada.
+\section{Desarrollo del software: metodología incremental}
+
+El software de la plataforma se desarrolló en MATLAB mediante incrementos, cada uno con una versión funcional y verificada antes de pasar al siguiente (Tabla~\ref{tab:incrementos}). La versión 3 corresponde a la siguiente etapa de implementación.
+
+\begin{table}[htbp]
+\centering
+\caption{Incrementos del software}
+\label{tab:incrementos}
+\small
+\begin{tabular}{p{1.2cm}p{7.2cm}p{4.4cm}}
+\hline
+\textbf{Versión} & \textbf{Alcance} & \textbf{Estado} \\
+\hline
+v0 & Simulador de datos de un compresor y modelo de comportamiento normal & Completado \\
+v1 & Indicadores térmico y de ciclaje, IHO y prueba de robustez & Completado \\
+v2 & Plantilla, archivo de configuración, calibración automática y reglas expertas, probada con dos equipos & Completado \\
+v3 & Lectura en línea desde el gateway por OPC UA o Modbus TCP y tablero web & Planificado \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Integración y generación de datos sintéticos}
+
+Debido a que no se cuenta con datos reales, la integración se verificó con datos sintéticos generados en MATLAB. El modelo de simulación representa la presión de la red con la regulación por carga y descarga, y la temperatura de salida del elemento como un sistema de primer orden:
+\begin{equation}
+\frac{dp}{dt} = \frac{p_{atm}\,(Q_c - Q_d)}{60\,V}, \qquad
+\frac{dT_e}{dt} = \frac{T_{ss} - T_e}{\tau}
+\end{equation}
+donde $Q_c$ es el caudal del compresor (el nominal en carga y 0 en descarga), $Q_d$ la demanda de la planta, $V$ el volumen útil de tanque y red, $T_{ss}$ la temperatura de equilibrio en el estado actual y $\tau$ la constante de tiempo. La demanda sigue un perfil de turnos con variación aleatoria y la temperatura ambiente, un ciclo diario. Los parámetros de cada equipo se toman de su archivo de configuración (Tabla~\ref{tab:config}); el paso de simulación es de 10\,s y el horizonte, de 60 días.
+
+Se simularon dos escenarios de degradación gradual a partir del día 30. En el escenario térmico, el incremento de temperatura crece de forma lineal hasta 30\,K al día 60, lo que representa la pérdida progresiva de capacidad del enfriador. En el escenario de ciclaje, el volumen útil se reduce hasta el 40\,\% de su valor inicial, como ocurriría con la acumulación de condensado en el tanque. La Figura~\ref{fig:operacion} muestra un día de operación normal simulada del compresor A.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.85\textwidth]{fig_operacion_normal.pdf}
-\caption{Operación normal simulada durante un día laborable}
+\caption{Operación normal simulada del compresor A durante un día laborable}
 \label{fig:operacion}
 \end{figure}
 
 \section{Plan de verificación y validación}
-\label{sec:vv}
 
-La verificación se realiza en tres niveles. Primero, el modelo de comportamiento normal se evalúa con datos de operación normal no usados en su ajuste, mediante el coeficiente de determinación ($R^2$) y la raíz del error cuadrático medio (RMSE). Segundo, cada escenario se simula y se registra el día en que la sombra digital confirma cada nivel de alerta, para compararlo con el inicio de la degradación y con el aviso del controlador. Tercero, se repite el análisis en 20 simulaciones por escenario, con distintos valores de inicio y magnitud de la falla, y se realiza una prueba de robustez en la que se agregan efectos térmicos no incluidos en el modelo. Los resultados se contrastan con los requerimientos de la Tabla~\ref{tab:req}. La validación con datos reales del compresor queda como etapa posterior a este proyecto.
+La verificación se realiza en cuatro niveles. Primero, el modelo de comportamiento normal de cada equipo se evalúa con datos de operación normal no usados en su calibración, mediante el coeficiente de determinación ($R^2$) y la raíz del error cuadrático medio (RMSE). Segundo, cada escenario se simula y se registra el día en que la plataforma confirma cada nivel de alerta, para compararlo con el inicio de la degradación y con el aviso del controlador. Tercero, el análisis se repite en 10 simulaciones por escenario y por equipo, con distintos valores de inicio y magnitud de la falla, y se realiza una prueba de robustez con efectos térmicos no incluidos en el modelo. Cuarto, se evalúan las capacidades de la plataforma con la tabla periódica de capacidades \cite{dtc_cpt} y su nivel de madurez con la escala TRL \cite{iso16290}. Los resultados se contrastan con los requerimientos de la Tabla~\ref{tab:req}. La validación con datos reales queda como etapa posterior a este proyecto.
