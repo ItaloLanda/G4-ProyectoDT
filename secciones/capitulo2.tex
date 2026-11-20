@@ -8,7 +8,7 @@ El gemelo digital se planteó como una representación virtual vinculada a un pr
 
 \section{Soluciones existentes en compresores de tornillo}
 
-Los modelos físicos de compresores lubricados explican su comportamiento térmico, pero se orientan al diseño y no a la supervisión \cite{liang2019,kumar2022}. Los enfoques basados en datos diagnostican fallas con aprendizaje automático, aunque requieren registros de fallas \cite{talbi2026,daoudi2025}. La Tabla~\ref{tab:soluciones} resume las soluciones más cercanas al proyecto.
+Los modelos físicos de compresores lubricados explican su comportamiento térmico, pero se orientan al diseño y no a la supervisión \cite{liang2019,kumar2022}. Los enfoques basados en datos diagnostican fallas con aprendizaje automático, aunque requieren registros de fallas \cite{talbi2026,daoudi2025} (Tabla~\ref{tab:soluciones}).
 
 \begin{table}[H]
 \centering
@@ -29,8 +29,8 @@ Talbi et al.~\cite{talbi2026}; Daoudi et al.~\cite{daoudi2025} & Diagnóstico co
 
 \section{Marcos de referencia y normas}
 
-El PSAF del Digital Twin Consortium organiza un gemelo digital en plataforma TI/OT, representación virtual, interfaces de servicio y aplicaciones \cite{dtc_psaf}, y su tabla periódica de capacidades identifica las capacidades requeridas \cite{dtc_cpt}. La IEC 62264 (ISA-95) ordena los componentes por niveles \cite{iec62264}; la ISO 13374, el procesamiento de datos de monitoreo \cite{iso13374}; y la ISO 16290, la madurez tecnológica \cite{iso16290}. OPC UA \cite{iec62541} y FMI \cite{blochwitz2012} permiten intercambiar datos y modelos entre herramientas.
+El PSAF del Digital Twin Consortium organiza un gemelo digital en plataforma TI/OT, representación virtual, interfaces de servicio y aplicaciones \cite{dtc_psaf}, y su tabla periódica de capacidades identifica las capacidades requeridas \cite{dtc_cpt}. La IEC 62264 (ISA-95) ordena los componentes por niveles \cite{iec62264}; la ISO 13374, el procesamiento de datos de monitoreo \cite{iso13374}; y la ISO 16290, la madurez tecnológica \cite{iso16290}. OPC UA \cite{iec62541} y FMI \cite{blochwitz2012} facilitan la interoperabilidad.
 
 \section{Brecha identificada}
 
-Las soluciones revisadas usan umbrales sin modelo esperado, firmas eléctricas o modelos que requieren datos de fallas, y en su mayoría atienden a un equipo en particular. No se identificó una plataforma configurable que calibre, con la configuración y el histórico de cada compresor de tornillo lubricado de velocidad fija, un modelo térmico esperado y lo combine con indicadores de ciclaje y reglas expertas en un índice de salud interpretable.
+Las soluciones revisadas usan umbrales sin modelo esperado, firmas eléctricas o modelos que requieren datos de fallas, y suelen atender a un solo equipo. No se identificó una plataforma configurable que calibre, con el histórico de cada compresor de tornillo lubricado de velocidad fija, un modelo térmico esperado combinado con indicadores de ciclaje y reglas expertas en un índice de salud interpretable.
