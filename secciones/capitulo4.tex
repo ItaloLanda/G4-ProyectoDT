@@ -4,6 +4,28 @@ Los resultados de este capítulo provienen de la simulación descrita en el Cap�
 
 \section{Calibración en dos equipos}
 
+La plataforma se probó con los dos equipos de la Tabla~\ref{tab:config}, cuyos valores son supuestos para la demostración.
+
+\begin{table}[htbp]
+\centering
+\caption{Configuraciones de los equipos de demostración (valores supuestos)}
+\label{tab:config}
+\small
+\begin{tabular}{p{6.4cm}p{3.0cm}p{3.0cm}}
+\hline
+\textbf{Parámetro} & \textbf{Compresor A} & \textbf{Compresor B} \\
+\hline
+Potencia & 45\,kW & 22\,kW \\
+Caudal en carga & 7,6\,m$^3$/min & 3,6\,m$^3$/min \\
+Banda de presión (carga / descarga) & 6,5 / 7,5\,bar(g) & 7,0 / 8,0\,bar(g) \\
+Volumen útil de tanque y red & 12\,m$^3$ & 5\,m$^3$ \\
+Aviso por alta temperatura & 110\,°C & 110\,°C \\
+Límite de ciclos por hora & 20 & 25 \\
+Temperatura media de la sala & 24\,°C & 28\,°C \\
+\hline
+\end{tabular}
+\end{table}
+
 Con el mismo código y cambiando solo el archivo de configuración, la plataforma calibró un modelo distinto para cada compresor a partir de 14 días de histórico (Tabla~\ref{tab:calibracion}). En ambos casos el coeficiente de la temperatura ambiente es cercano a 1, lo que es coherente con el hecho de que el incremento de temperatura en la compresión se suma a la temperatura de entrada. En cambio, los coeficientes de la fracción en carga y de la presión difieren entre equipos, porque dependen de su potencia, su banda de presión y su comportamiento térmico. Ambos modelos cumplen el requerimiento R9 y demuestran los requerimientos R7 y R8.
 
 \begin{table}[htbp]

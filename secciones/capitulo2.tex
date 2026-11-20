@@ -1,50 +1,36 @@
-% Capitulo II: Estado del arte (borrador, 1-2 paginas)
-% Solo afirmaciones verificadas en Crossref, resumenes o texto de cada fuente.
+% Capitulo II: Estado del arte (maximo 2 paginas)
 
 \chapter{ESTADO DEL ARTE}
 
 \section{Gemelo digital y sombra digital}
 
-El concepto de gemelo digital fue planteado como una representación virtual vinculada a un producto físico durante su ciclo de vida, capaz de anticipar comportamientos no deseados de sistemas complejos \cite{grieves2017}. Desde entonces, su aplicación en la industria ha crecido en diseño, producción y servicio \cite{tao2019tii}. Para ordenar la literatura, Kritzinger et al.~\cite{kritzinger2018} distinguen tres niveles según el flujo de datos entre el activo y su representación: el modelo digital, sin intercambio automático de datos; la sombra digital, con un flujo automático desde el activo físico hacia el modelo; y el gemelo digital, en el que el flujo es automático en ambos sentidos. Esta clasificación es la base del presente proyecto, ya que la solución propuesta recibe datos del compresor, pero no actúa sobre él. Respecto al mantenimiento, Zhong et al.~\cite{zhong2023} describen cómo estas representaciones digitales permiten pasar del mantenimiento predictivo tradicional a uno apoyado en modelos y datos de operación.
+El gemelo digital se planteó como una representación virtual vinculada a un producto físico durante su ciclo de vida \cite{grieves2017}, y su uso en la industria ha crecido en diseño, producción y servicio \cite{tao2019tii}. Kritzinger et al.~\cite{kritzinger2018} distinguen el modelo digital, sin intercambio automático de datos; la sombra digital, con flujo automático del activo hacia el modelo; y el gemelo digital, con flujo automático en ambos sentidos. En mantenimiento, estas representaciones permiten apoyar las decisiones con modelos y datos de operación \cite{zhong2023}.
 
-\section{Modelos y diagnóstico de compresores de tornillo}
+\section{Soluciones existentes en compresores de tornillo}
 
-La literatura sobre compresores de tornillo lubricados presenta dos líneas de trabajo. La primera corresponde a modelos físicos de desempeño. Liang y Wu~\cite{liang2019} desarrollaron en MATLAB un modelo termodinámico del compresor en estado de descarga y lo validaron de forma experimental, lo cual es relevante para equipos de velocidad fija, que alternan entre carga y descarga. Por su parte, Kumar et al.~\cite{kumar2022} validaron un modelo de un compresor de 22\,kW y encontraron que la viscosidad y la temperatura de inyección del aceite son los parámetros que más influyen en su desempeño, con un rango recomendado de 40 a 60\,°C. Estos modelos explican el comportamiento térmico del equipo, pero fueron planteados para el diseño y la optimización, no para la supervisión de su condición.
-
-La segunda línea corresponde al diagnóstico de fallas basado en datos. Talbi et al.~\cite{talbi2026} aplicaron redes neuronales artificiales al diagnóstico de fallas en compresores de tornillo, y Daoudi et al.~\cite{daoudi2025} compararon algoritmos de aprendizaje automático para su mantenimiento predictivo. Este enfoque alcanza buenos resultados cuando se dispone de registros históricos de fallas, condición que no siempre se cumple en la práctica.
-
-Recientemente se han propuesto soluciones que combinan ambas líneas. Nitsak y Bosak~\cite{nitsak2026} desarrollaron un gemelo digital híbrido, con un modelo físico del motor eléctrico y una red neuronal LSTM como corrector, y lo validaron con datos de SCADA de dos compresores de tornillo de 200 y 250\,kW, uno de ellos de velocidad fija. Su línea base de operación sana permitió detectar desviaciones menores al 5\,\%, aunque se basa en la corriente del motor y no en variables térmicas. A su vez, Baskanbayeva et al.~\cite{baskanbayeva2026} construyeron un gemelo digital termodinámico de un compresor de tornillo para gas, orientado a evaluar el efecto de la temperatura ambiente estacional sobre su desempeño.
-
-\section{Soluciones de monitoreo existentes}
-
-En el ámbito del monitoreo remoto, Pinza Apolo et al.~\cite{pinzaapolo2026} implementaron un sistema IIoT de bajo costo para un compresor scroll de refrigeración, con sensores de temperatura, corriente y vibración, un PLC, la plataforma Node-RED y almacenamiento en la nube. Durante 49 días detectaron anomalías mediante una línea base estadística y umbrales de referencia. Hanifi et al.~\cite{hanifi2025}, por su parte, adaptaron una máquina antigua con sensores de energía y de aire comprimido comunicados por Modbus TCP/IP, lo que permitió identificar una fuga persistente y cerrarla con una válvula automática. La Tabla~\ref{tab:soluciones} resume estas soluciones.
+Los modelos físicos de compresores lubricados, como el modelo termodinámico en estado de descarga desarrollado en MATLAB por Liang y Wu~\cite{liang2019} o el modelo de un equipo de 22\,kW de Kumar et al.~\cite{kumar2022}, explican su comportamiento térmico, pero se orientan al diseño y no a la supervisión. Los enfoques basados en datos diagnostican fallas con redes neuronales o aprendizaje automático \cite{talbi2026,daoudi2025}, aunque requieren registros históricos de fallas. La Tabla~\ref{tab:soluciones} resume las soluciones más cercanas al proyecto.
 
 \begin{table}[htbp]
 \centering
 \caption{Comparación de soluciones existentes}
 \label{tab:soluciones}
-\small
-\begin{tabular}{p{2.4cm}p{2.6cm}p{3.6cm}p{3.6cm}}
+\footnotesize
+\begin{tabular}{p{2.3cm}p{3.3cm}p{3.6cm}p{3.6cm}}
 \hline
-\textbf{Fuente} & \textbf{Equipo} & \textbf{Ventajas} & \textbf{Limitaciones} \\
+\textbf{Fuente} & \textbf{Solución} & \textbf{Ventajas} & \textbf{Limitaciones} \\
 \hline
-Pinza Apolo et al.~\cite{pinzaapolo2026} & Compresor scroll de refrigeración & Bajo costo, validación en operación real durante 49 días & Detección por umbrales y estadística, sin modelo del comportamiento esperado \\
-Hanifi et al.~\cite{hanifi2025} & Prensa con consumo de aire comprimido & Adaptación de equipos antiguos; detección de fugas & Enfocado en energía; no supervisa el compresor \\
-Nitsak y Bosak~\cite{nitsak2026} & Compresores de tornillo de 200 y 250\,kW & Modelo híbrido validado con datos reales & Basado en la corriente del motor; requiere red neuronal y datos de SCADA \\
-Baskanbayeva et al.~\cite{baskanbayeva2026} & Compresor de tornillo para gas & Modelo termodinámico validado en campo & Orientado al desempeño estacional, no al mantenimiento \\
-Talbi et al.~\cite{talbi2026}; Daoudi et al.~\cite{daoudi2025} & Compresores de tornillo & Diagnóstico automático de fallas & Requieren datos históricos de fallas etiquetados \\
+Pinza Apolo et al.~\cite{pinzaapolo2026} & Monitoreo IIoT de un compresor scroll (PLC, Node-RED, nube) & Bajo costo; validado 49 días en operación real & Umbrales y estadística, sin modelo del comportamiento esperado \\
+Nitsak y Bosak~\cite{nitsak2026} & Gemelo híbrido en compresores de 200 y 250\,kW & Modelo físico corregido con LSTM y datos de SCADA & Basado en la corriente del motor; un equipo por modelo \\
+Baskanbayeva et al.~\cite{baskanbayeva2026} & Gemelo termodinámico de un compresor para gas & Validado en campo & Orientado al desempeño estacional, no al mantenimiento \\
+Talbi et al.~\cite{talbi2026}; Daoudi et al.~\cite{daoudi2025} & Diagnóstico con aprendizaje automático & Clasificación automática de fallas & Requiere datos de fallas etiquetados \\
 \hline
 \end{tabular}
 \end{table}
 
-\section{Normas e interoperabilidad}
+\section{Marcos de referencia y normas}
 
-Para el diseño de este tipo de soluciones existen marcos de referencia. La norma ISO 23247 establece un marco para gemelos digitales en manufactura \cite{iso23247}, mientras que la ISO 13374 ordena el procesamiento de datos de monitoreo de condición en etapas, desde la adquisición hasta la detección del estado, la evaluación de la salud y la generación de recomendaciones \cite{iso13374}. En cuanto a la comunicación, el estándar OPC UA \cite{iec62541} permite el intercambio de datos entre equipos de distintos fabricantes, y Morato et al.~\cite{morato2020} evaluaron sus implementaciones para aplicaciones de medición distribuida. Asimismo, el estándar FMI permite intercambiar modelos de simulación entre herramientas, como MATLAB/Simulink, Python u otras plataformas \cite{blochwitz2012}.
-
-\section{Marcos de referencia para gemelos digitales}
-
-El Digital Twin Consortium propone el marco PSAF (Platform Stack Architectural Framework), que organiza un gemelo digital en una plataforma de tecnologías de información y operación (TI/OT), una representación virtual, interfaces de servicio y aplicaciones, y que define los mecanismos de sincronización entre el activo y su representación según su dirección, frecuencia y nivel de detalle \cite{dtc_psaf}. El mismo consorcio publica la tabla periódica de capacidades, que permite identificar qué capacidades de datos, integración, inteligencia, experiencia de usuario, gestión y confiabilidad requiere una solución \cite{dtc_cpt}. Para ubicar los componentes dentro de la planta se emplea el modelo jerárquico de la norma IEC 62264, basada en ISA-95, que distingue los niveles de proceso, control, supervisión, operaciones y negocio \cite{iec62264}. Por último, la madurez de la solución puede expresarse mediante la escala de niveles de preparación tecnológica (TRL) de la norma ISO 16290 \cite{iso16290}.
+El marco PSAF del Digital Twin Consortium organiza un gemelo digital en una plataforma TI/OT, una representación virtual, interfaces de servicio y aplicaciones, y define sus mecanismos de sincronización \cite{dtc_psaf}; su tabla periódica de capacidades permite identificar las capacidades que requiere la solución \cite{dtc_cpt}. La norma IEC 62264, basada en ISA-95, ordena los componentes por niveles \cite{iec62264}; la ISO 13374, el procesamiento de datos de monitoreo de condición \cite{iso13374}; y la ISO 16290, la madurez tecnológica mediante la escala TRL \cite{iso16290}. Para la comunicación con el controlador se dispone de OPC UA \cite{iec62541,morato2020}, y para el intercambio de modelos entre herramientas, del estándar FMI \cite{blochwitz2012}.
 
 \section{Brecha identificada}
 
-De la revisión se desprende que las soluciones existentes detectan anomalías con umbrales o estadística sin un modelo del comportamiento esperado \cite{pinzaapolo2026}, emplean firmas eléctricas en compresores de gran potencia \cite{nitsak2026} o requieren datos históricos de fallas para entrenar sus modelos \cite{talbi2026,daoudi2025}. Asimismo, la mayoría se desarrolla para un equipo en particular. En la revisión realizada no se identificó una plataforma configurable que, a partir de la configuración de cada compresor de tornillo lubricado de velocidad fija y de su histórico de operación, calibre un modelo del comportamiento térmico esperado y lo combine con indicadores de ciclaje y reglas expertas en un índice de salud interpretable para el personal de mantenimiento, sobre una arquitectura basada en estándares abiertos.
+Las soluciones revisadas emplean umbrales sin modelo del comportamiento esperado, firmas eléctricas en compresores de gran potencia o modelos que requieren datos de fallas, y en su mayoría se desarrollan para un equipo en particular. En la revisión realizada no se identificó una plataforma configurable que, a partir de la configuración y del histórico de cada compresor de tornillo lubricado de velocidad fija, calibre un modelo del comportamiento térmico esperado y lo combine con indicadores de ciclaje y reglas expertas en un índice de salud interpretable, sobre una arquitectura basada en estándares abiertos.
