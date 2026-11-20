@@ -1,189 +1,70 @@
+% Capitulo IV: Resultados esperados (maximo 4 paginas)
+
 \chapter{RESULTADOS ESPERADOS}
 
-Los resultados de este capítulo provienen de la simulación descrita en el Capítulo III y representan el desempeño esperado de la plataforma con datos sintéticos. Su objetivo es demostrar que la solución es funcional, segura y coherente con el problema planteado; no reemplaza la validación con datos reales.
+Este capítulo expone el desempeño esperado de la plataforma a partir de la simulación descrita en el Capítulo III. Su propósito no es validar una teoría, sino mostrar que la solución diseñada es funcional, segura y coherente con el problema planteado.
 
-\section{Calibración en dos equipos}
+\section{Solución funcional}
 
-La plataforma se probó con los dos equipos de la Tabla~\ref{tab:config}, cuyos valores son supuestos para la demostración.
+Con el mismo código y cambiando solo el archivo de configuración, la plataforma calibró un modelo distinto para cada compresor con 14 días de histórico y detectó los dos escenarios de degradación en ambos equipos (Tabla~\ref{tab:desempeno}). En el compresor A, la alerta amarilla del escenario térmico se confirmó 3 días después del inicio de la falla y unos 23 días antes del aviso por alta temperatura del controlador, ya que la temperatura todavía estaba por debajo de 110\,°C, pero era mayor que la esperada para las condiciones de operación. El ciclaje excesivo, que el controlador no advierte, se detectó entre 5 y 11 días después de iniciado.
 
 \begin{table}[htbp]
 \centering
-\caption{Configuraciones de los equipos de demostración (valores supuestos)}
-\label{tab:config}
-\small
-\begin{tabular}{p{6.4cm}p{3.0cm}p{3.0cm}}
+\caption{Desempeño esperado de la plataforma en dos equipos (10 simulaciones por escenario)}
+\label{tab:desempeno}
+\footnotesize
+\begin{tabular}{p{7.0cm}p{3.0cm}p{3.0cm}}
 \hline
-\textbf{Parámetro} & \textbf{Compresor A} & \textbf{Compresor B} \\
+\textbf{Indicador} & \textbf{Compresor A} & \textbf{Compresor B} \\
 \hline
-Potencia & 45\,kW & 22\,kW \\
-Caudal en carga & 7,6\,m$^3$/min & 3,6\,m$^3$/min \\
-Banda de presión (carga / descarga) & 6,5 / 7,5\,bar(g) & 7,0 / 8,0\,bar(g) \\
-Volumen útil de tanque y red & 12\,m$^3$ & 5\,m$^3$ \\
-Aviso por alta temperatura & 110\,°C & 110\,°C \\
-Límite de ciclos por hora & 20 & 25 \\
-Temperatura media de la sala & 24\,°C & 28\,°C \\
+Potencia y temperatura media de la sala (supuestas) & 45\,kW; 24\,°C & 22\,kW; 28\,°C \\
+$R^2$ y RMSE del modelo calibrado & 0,962; 1,13\,K & 0,965; 1,45\,K \\
+Térmico: días hasta el nivel amarillo & 3,2 $\pm$ 0,7 & 3,1 $\pm$ 0,5 \\
+Térmico: anticipación frente al aviso del controlador & 23,5 $\pm$ 1,8 días & 16,0 $\pm$ 2,2 días \\
+Ciclaje: días hasta el nivel amarillo & 11,2 $\pm$ 2,2 & 4,8 $\pm$ 1,2 \\
+Tiempo fuera de verde sin falla & 0,00\,\% & 0,33\,\% \\
 \hline
 \end{tabular}
 \end{table}
 
-Con el mismo código y cambiando solo el archivo de configuración, la plataforma calibró un modelo distinto para cada compresor a partir de 14 días de histórico (Tabla~\ref{tab:calibracion}). En ambos casos el coeficiente de la temperatura ambiente es cercano a 1, lo que es coherente con el hecho de que el incremento de temperatura en la compresión se suma a la temperatura de entrada. En cambio, los coeficientes de la fracción en carga y de la presión difieren entre equipos, porque dependen de su potencia, su banda de presión y su comportamiento térmico. Ambos modelos cumplen el requerimiento R9 y demuestran los requerimientos R7 y R8.
-
-\begin{table}[htbp]
-\centering
-\caption{Modelos calibrados por la plataforma}
-\label{tab:calibracion}
-\small
-\begin{tabular}{p{4.6cm}p{3.6cm}p{3.6cm}}
-\hline
-\textbf{Resultado} & \textbf{Compresor A (45\,kW)} & \textbf{Compresor B (22\,kW)} \\
-\hline
-$\beta_0$ (°C) & 34,40 & 18,87 \\
-$\beta_1$ (temperatura ambiente) & 1,050 & 1,045 \\
-$\beta_2$ (fracción en carga) & 12,90 & 19,35 \\
-$\beta_3$ (presión) & 0,98 & 3,03 \\
-$R^2$ de validación & 0,962 & 0,965 \\
-RMSE de validación & 1,13\,K & 1,45\,K \\
-Ciclos por hora de referencia & 7,7 & 7,6 \\
-\hline
-\end{tabular}
-\end{table}
-
-La Figura~\ref{fig:modelo} muestra la validación del modelo del compresor A en una simulación representativa: el residual se distribuye de forma simétrica alrededor de cero, sin sesgo sistemático en operación normal.
+La Figura~\ref{fig:plataforma} muestra el índice de salud operacional de ambos equipos. En operación normal se mantuvo en verde, y en los escenarios de falla descendió de forma progresiva por los cuatro niveles. En cada caso, la base de reglas identificó el síntoma correcto y emitió la acción recomendada: inspeccionar el enfriador, la ventilación y el aceite ante la anomalía térmica, y revisar el purgador y la banda de presión ante el ciclaje.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{fig_modelo_normal.pdf}
-\caption{Validación del modelo de comportamiento normal del compresor A}
-\label{fig:modelo}
-\end{figure}
-
-\section{Escenario 1: anomalía térmica}
-
-En la simulación representativa del compresor A, la degradación del enfriamiento comenzó el día 30. La plataforma confirmó el nivel amarillo el día 32,7, el naranja el día 35,6 y el rojo el día 38,4, mientras que el aviso por alta temperatura del controlador se activó recién el día 56,6 (Figura~\ref{fig:termico}). Es decir, la alerta amarilla se anticipó 23,9 días al aviso del controlador. La razón es que, en los primeros días, la temperatura máxima seguía por debajo de 110\,°C, pero ya era mayor que la esperada para las condiciones de operación de cada momento.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{fig_escenario_termico.pdf}
-\caption{Escenario térmico del compresor A: temperatura máxima diaria y desviación sostenida}
-\label{fig:termico}
-\end{figure}
-
-\section{Escenario 2: ciclaje excesivo}
-
-En el compresor A, la reducción del volumen útil comenzó el día 30 y elevó los ciclos de carga de 7,7 a 17,4 por hora al final del horizonte. La plataforma confirmó el nivel amarillo el día 41,4, cuando el aumento sostenido alcanzó el 20\,\%, y el rojo el día 51,2 (Figura~\ref{fig:ciclaje}). Este escenario no genera ningún aviso en el controlador, por lo que la plataforma aporta información que actualmente no está disponible para el personal.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{fig_escenario_ciclaje.pdf}
-\caption{Escenario de ciclaje del compresor A: ciclos de carga por hora y aumento relativo}
-\label{fig:ciclaje}
-\end{figure}
-
-\section{Índice de salud y diagnóstico en ambos equipos}
-
-La Figura~\ref{fig:plataforma} compara el IHO de los dos equipos. En operación normal, el índice se mantuvo en verde; en los escenarios de falla, descendió de forma progresiva por los cuatro niveles. En ambos equipos, la base de reglas identificó el síntoma correcto en cada escenario y emitió la acción recomendada correspondiente: la inspección del enfriador, la ventilación y el aceite en el escenario térmico, y la revisión del purgador y de la banda de presión en el escenario de ciclaje. En el escenario térmico, la regla de límites también advirtió que la temperatura se acercaba al aviso del controlador.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{fig_plataforma_iho.pdf}
+\includegraphics[width=0.9\textwidth]{fig_plataforma_iho.pdf}
 \caption{Índice de salud operacional de los dos equipos calibrados por la plataforma}
 \label{fig:plataforma}
 \end{figure}
 
-La Tabla~\ref{tab:mc} resume las 10 simulaciones por escenario y por equipo, con inicio de la falla entre los días 25 y 35 y magnitudes variables.
+\section{Solución segura}
 
-\begin{table}[htbp]
-\centering
-\caption{Desempeño esperado en 10 simulaciones por escenario}
-\label{tab:mc}
-\small
-\begin{tabular}{p{6.2cm}p{3.2cm}p{3.2cm}}
-\hline
-\textbf{Indicador} & \textbf{Compresor A} & \textbf{Compresor B} \\
-\hline
-Tiempo fuera de verde sin falla & 0,00\,\% & 0,33\,\% \\
-Térmico: días hasta el nivel amarillo & 3,2 $\pm$ 0,7 & 3,1 $\pm$ 0,5 \\
-Térmico: anticipación frente al aviso del controlador & 23,5 $\pm$ 1,8 días (5 de 10) & 16,0 $\pm$ 2,2 días (10 de 10) \\
-Ciclaje: días hasta el nivel amarillo & 11,2 $\pm$ 2,2 & 4,8 $\pm$ 1,2 \\
-\hline
-\end{tabular}
-\end{table}
+La plataforma solo lee los datos del controlador y entrega recomendaciones al personal; no modifica consignas ni protecciones, por lo que las alarmas y paradas del equipo se mantienen intactas. Respecto a la confiabilidad de las alertas, el tiempo fuera de verde sin falla fue menor al 1\,\% en ambos equipos. Para estimar el efecto de condiciones no representadas en el modelo, como la humedad o un sensor descalibrado, se agregó a la temperatura del compresor A una perturbación lenta: con 1\,K no hubo alertas sin causa, con 2\,K el índice salió de verde el 3,8\,\% del tiempo y con 3\,K, el 12,4\,\%, sin dejar de detectar la falla. En consecuencia, en una implementación real los umbrales deberán calibrarse con datos del equipo.
 
-En el compresor A, el aviso del controlador solo se alcanzó en 5 de las 10 simulaciones del escenario térmico; en las demás, la degradación no llegó a activarlo, pero la plataforma sí la detectó. En el compresor B, que opera en una sala más caliente, el aviso se alcanzó en todas las simulaciones y la anticipación fue menor. El ciclaje se detectó antes en el compresor B porque su volumen útil es menor y, por lo tanto, más sensible a la pérdida de volumen. Estos resultados cumplen los requerimientos R1, R2 y R3.
+\section{Solución coherente con el problema}
 
-\section{Robustez y limitaciones}
-
-Los datos sintéticos siguen la misma estructura que el modelo, lo que favorece una baja tasa de falsas alarmas. Para estimar el comportamiento en condiciones reales, se agregó a la temperatura medida del compresor A un efecto térmico lento que el modelo no conoce, como el que podrían producir la humedad, equipos cercanos o un sensor descalibrado (Tabla~\ref{tab:robustez}).
-
-\begin{table}[htbp]
-\centering
-\caption{Prueba de robustez frente a efectos térmicos no modelados (compresor A, 10 simulaciones por nivel)}
-\label{tab:robustez}
-\small
-\begin{tabular}{p{4.2cm}p{4.6cm}p{4.2cm}}
-\hline
-\textbf{Perturbación no modelada (K)} & \textbf{Tiempo fuera de verde sin falla} & \textbf{Detección de la falla térmica} \\
-\hline
-0 & 0,0\,\% & 10 de 10 \\
-1 & 0,0\,\% & 10 de 10 \\
-2 & 3,8\,\% & 10 de 10 \\
-3 & 12,4\,\% & 10 de 10 \\
-\hline
-\end{tabular}
-\end{table}
-
-Con perturbaciones de hasta 2\,K, el tiempo fuera de verde sin falla se mantiene por debajo del 5\,\%; con 3\,K, el índice genera alertas sin causa durante el 12,4\,\% del tiempo. Por ello, en una implementación real los umbrales deberán calibrarse con datos del equipo y podría ser necesario incorporar otras variables al modelo, como la temperatura del aceite. Otras limitaciones son el uso de parámetros supuestos, la ausencia de datos reales y la representación de las fallas como degradaciones lineales.
-
-\section{Capacidades y nivel de madurez}
-
-La Tabla~\ref{tab:cpt} ubica la plataforma en las categorías de la tabla periódica de capacidades \cite{dtc_cpt}. Las capacidades cubiertas son las necesarias para la supervisión de condición; las de aprendizaje automático, gestión de dispositivos y ciberseguridad se proponen para las siguientes etapas.
-
-\begin{table}[htbp]
-\centering
-\caption{Capacidades de la plataforma según la tabla periódica de capacidades}
-\label{tab:cpt}
-\small
-\begin{tabular}{p{3.0cm}p{6.6cm}p{3.4cm}}
-\hline
-\textbf{Categoría} & \textbf{Capacidad} & \textbf{Estado} \\
-\hline
-Servicios de datos & Adquisición, agregación en ventanas e histórico & Cubierta (simulada) \\
-Integración & Integración con el controlador por OPC UA o Modbus TCP & Propuesta (v3) \\
-Inteligencia & Modelo de comportamiento normal, reglas expertas, alertas & Cubierta \\
-Inteligencia & Aprendizaje automático y vida útil remanente & Trabajo futuro \\
-Experiencia de usuario & Índice con semáforo, tendencias y recomendación & Cubierta \\
-Gestión & Plantillas y configuración por equipo & Cubierta \\
-Confiabilidad & Acceso de solo lectura al controlador & Cubierta por diseño \\
-Confiabilidad & Ciberseguridad de la red de planta & Trabajo futuro \\
-\hline
-\end{tabular}
-\end{table}
-
-Respecto a la madurez, la plataforma se encuentra en el nivel TRL 3 de la norma ISO 16290 \cite{iso16290}, ya que su función crítica se demostró de forma analítica mediante simulación. La ruta propuesta es alcanzar el TRL 4 al validar los modelos con históricos reales extraídos del controlador, y el TRL 5 o 6 con una prueba piloto del gateway en una planta.
-
-\section{Cumplimiento de requerimientos}
-
-La Tabla~\ref{tab:cumplimiento} resume el cumplimiento de los requerimientos definidos en el Capítulo III.
+La Tabla~\ref{tab:cumplimiento} contrasta los resultados con los requerimientos derivados del problema.
 
 \begin{table}[htbp]
 \centering
 \caption{Cumplimiento de requerimientos}
 \label{tab:cumplimiento}
-\small
-\begin{tabular}{p{0.8cm}p{5.0cm}p{5.4cm}p{1.8cm}}
+\footnotesize
+\begin{tabular}{p{0.7cm}p{4.6cm}p{5.6cm}p{2.0cm}}
 \hline
 \textbf{ID} & \textbf{Criterio} & \textbf{Resultado esperado} & \textbf{Estado} \\
 \hline
-R1 & Anticipación mínima de 7 días & 23,5 días (A) y 16,0 días (B) frente al aviso del controlador & Cumple \\
-R2 & Alerta ante un aumento de ciclos de 20\,\% & Nivel amarillo confirmado al superar el 20\,\% & Cumple \\
-R3 & Menos del 5\,\% del tiempo fuera de verde sin falla & 0,00\,\% (A) y 0,33\,\% (B); 3,8\,\% con 2\,K de perturbación & Cumple con calibración \\
-R4 & Acceso de solo lectura & La arquitectura no envía órdenes al controlador & Cumple por diseño \\
-R5 & Índice, causa probable y acción & IHO con semáforo y base de reglas & Cumple \\
-R6 & Sin sensores adicionales & Solo variables del controlador & Cumple por diseño \\
-R7 & Dos configuraciones con el mismo código & Compresores A y B & Cumple \\
-R8 & Calibración con 14 días de datos & Modelos de la Tabla~\ref{tab:calibracion} & Cumple \\
+R1 & Anticipación mínima de 7 días & 23,5 días (A) y 16,0 días (B) & Cumple \\
+R2 & Alerta ante un aumento de ciclos de 20\,\% & Nivel amarillo al superar el 20\,\% & Cumple \\
+R3 & Menos del 5\,\% fuera de verde sin falla & 0,00\,\% (A), 0,33\,\% (B); 3,8\,\% con 2\,K & Cumple \\
+R4 & Acceso de solo lectura & Sin órdenes al controlador & Por diseño \\
+R5 & Índice, causa probable y acción & IHO con semáforo y reglas expertas & Cumple \\
+R6 & Sin sensores adicionales & Solo variables del controlador & Por diseño \\
+R7 & Dos configuraciones, mismo código & Compresores A y B & Cumple \\
+R8 & Calibración con 14 días de datos & Un modelo por equipo & Cumple \\
 R9 & RMSE de validación menor a 2\,K & 1,13\,K (A) y 1,45\,K (B) & Cumple \\
-R10 & Estándares abiertos & OPC UA y FMI en la arquitectura propuesta & Propuesto \\
+R10 & Estándares abiertos & OPC UA y FMI en la arquitectura & Propuesto \\
 \hline
 \end{tabular}
 \end{table}
+
+Según la tabla periódica de capacidades \cite{dtc_cpt}, la plataforma cubre las capacidades de datos, inteligencia (modelo, reglas y alertas), experiencia de usuario y gestión de configuraciones, mientras que la integración en línea, el aprendizaje automático y la ciberseguridad quedan para las siguientes etapas. Su madurez corresponde al nivel TRL 3 de la ISO 16290 \cite{iso16290}, al haberse demostrado su función de forma analítica; el TRL 4 se alcanzaría al validarla con históricos reales y el TRL 5 o 6, con una prueba piloto del gateway en planta.
