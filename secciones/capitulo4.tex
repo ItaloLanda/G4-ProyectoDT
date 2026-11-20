@@ -1,12 +1,19 @@
-% Capitulo IV: Resultados esperados (maximo 4 paginas)
+% Capitulo IV: Resultados esperados (maximo 5 paginas)
 
 \chapter{RESULTADOS ESPERADOS}
 
-Este capítulo expone el desempeño esperado de la plataforma a partir de la simulación descrita en el Capítulo III. Su propósito no es validar una teoría, sino mostrar que la solución diseñada es funcional, segura y coherente con el problema planteado.
+Este capítulo expone el desempeño esperado de la plataforma a partir de la simulación descrita en el Capítulo III. Su propósito no es validar una teoría, sino mostrar que la solución diseñada es funcional, segura y coherente con el problema planteado. La Figura~\ref{fig:concepto} resume cómo se espera que opere una vez implementada: el gateway lee el controlador del compresor por Ethernet, la plataforma evalúa su condición y el personal de mantenimiento recibe el índice de salud, la causa probable y la acción recomendada.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig_concepto_implementacion.pdf}
+\caption{Concepto de implementación esperado de la plataforma. Imágenes: B. S. Elliott (CC BY-SA 4.0), Wikimedia Commons (CC BY-SA 3.0), Laserlicht (CC BY-SA 4.0) y Z22 (CC BY-SA 4.0), vía Wikimedia Commons; tablero: elaboración propia}
+\label{fig:concepto}
+\end{figure}
 
 \section{Solución funcional}
 
-Con el mismo código y cambiando solo el archivo de configuración, la plataforma calibró un modelo distinto para cada compresor con 14 días de histórico y detectó los dos escenarios de degradación en ambos equipos (Tabla~\ref{tab:desempeno}). En el compresor A, la alerta amarilla del escenario térmico se confirmó 3 días después del inicio de la falla y unos 23 días antes del aviso por alta temperatura del controlador, ya que la temperatura todavía estaba por debajo de 110\,°C, pero era mayor que la esperada para las condiciones de operación. El ciclaje excesivo, que el controlador no advierte, se detectó entre 5 y 11 días después de iniciado.
+Con el mismo código y cambiando solo el archivo de configuración, la plataforma calibró un modelo distinto para cada compresor con 14 días de histórico y detectó los dos escenarios de degradación en ambos equipos (Tabla~\ref{tab:desempeno}). En el compresor A, la alerta amarilla del escenario térmico se confirmó 3 días después del inicio de la falla y unos 23 días antes del aviso por alta temperatura del controlador, ya que la temperatura todavía estaba por debajo de 110\,°C, pero era mayor que la esperada para las condiciones de operación (Figura~\ref{fig:termico}). El ciclaje excesivo, que el controlador no advierte, se detectó entre 5 y 11 días después de iniciado.
 
 \begin{table}[htbp]
 \centering
@@ -27,6 +34,13 @@ Tiempo fuera de verde sin falla & 0,00\,\% & 0,33\,\% \\
 \end{tabular}
 \end{table}
 
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\textwidth]{fig_escenario_termico.pdf}
+\caption{Escenario térmico del compresor A: temperatura máxima diaria y desviación sostenida}
+\label{fig:termico}
+\end{figure}
+
 La Figura~\ref{fig:plataforma} muestra el índice de salud operacional de ambos equipos. En operación normal se mantuvo en verde, y en los escenarios de falla descendió de forma progresiva por los cuatro niveles. En cada caso, la base de reglas identificó el síntoma correcto y emitió la acción recomendada: inspeccionar el enfriador, la ventilación y el aceite ante la anomalía térmica, y revisar el purgador y la banda de presión ante el ciclaje.
 
 \begin{figure}[htbp]
@@ -34,6 +48,15 @@ La Figura~\ref{fig:plataforma} muestra el índice de salud operacional de ambos 
 \includegraphics[width=0.9\textwidth]{fig_plataforma_iho.pdf}
 \caption{Índice de salud operacional de los dos equipos calibrados por la plataforma}
 \label{fig:plataforma}
+\end{figure}
+
+La Figura~\ref{fig:tablero} muestra la vista esperada del tablero para el compresor A en el día 36 del escenario térmico: el índice en nivel naranja, la temperatura medida por encima de la esperada aunque lejos del aviso del controlador, la desviación sostenida frente a los umbrales y el diagnóstico con sus causas probables y la acción recomendada.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig_tablero.pdf}
+\caption{Vista esperada del tablero de la plataforma (elaboración propia con datos sintéticos)}
+\label{fig:tablero}
 \end{figure}
 
 \section{Solución segura}
