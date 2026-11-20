@@ -4,24 +4,24 @@
 
 \section{Gemelo digital y sombra digital}
 
-El gemelo digital se planteó como una representación virtual vinculada a un producto físico durante su ciclo de vida \cite{grieves2017}, y su uso en la industria ha crecido en diseño, producción y servicio \cite{tao2019tii}. Kritzinger et al.~\cite{kritzinger2018} distinguen el modelo digital, sin intercambio automático de datos; la sombra digital, con flujo automático del activo hacia el modelo; y el gemelo digital, con flujo automático en ambos sentidos. En mantenimiento, estas representaciones permiten apoyar las decisiones con modelos y datos de operación \cite{zhong2023}.
+El gemelo digital se planteó como una representación virtual vinculada a un producto físico durante su ciclo de vida \cite{grieves2017,tao2019tii}. Kritzinger et al.~\cite{kritzinger2018} distinguen el modelo digital, sin intercambio automático de datos; la sombra digital, con flujo automático del activo hacia el modelo; y el gemelo digital, con flujo en ambos sentidos. En mantenimiento, estas representaciones apoyan las decisiones con modelos y datos de operación \cite{zhong2023}.
 
 \section{Soluciones existentes en compresores de tornillo}
 
-Los modelos físicos de compresores lubricados, como el modelo termodinámico en estado de descarga desarrollado en MATLAB por Liang y Wu~\cite{liang2019} o el modelo de un equipo de 22\,kW de Kumar et al.~\cite{kumar2022}, explican su comportamiento térmico, pero se orientan al diseño y no a la supervisión. Los enfoques basados en datos diagnostican fallas con redes neuronales o aprendizaje automático \cite{talbi2026,daoudi2025}, aunque requieren registros históricos de fallas. La Tabla~\ref{tab:soluciones} resume las soluciones más cercanas al proyecto.
+Los modelos físicos de compresores lubricados explican su comportamiento térmico, pero se orientan al diseño y no a la supervisión \cite{liang2019,kumar2022}. Los enfoques basados en datos diagnostican fallas con aprendizaje automático, aunque requieren registros de fallas \cite{talbi2026,daoudi2025}. La Tabla~\ref{tab:soluciones} resume las soluciones más cercanas al proyecto.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption{Comparación de soluciones existentes}
 \label{tab:soluciones}
 \footnotesize
-\begin{tabular}{p{2.3cm}p{3.3cm}p{3.6cm}p{3.6cm}}
+\begin{tabular}{p{2.3cm}p{3.3cm}p{3.5cm}p{3.7cm}}
 \hline
 \textbf{Fuente} & \textbf{Solución} & \textbf{Ventajas} & \textbf{Limitaciones} \\
 \hline
-Pinza Apolo et al.~\cite{pinzaapolo2026} & Monitoreo IIoT de un compresor scroll (PLC, Node-RED, nube) & Bajo costo; validado 49 días en operación real & Umbrales y estadística, sin modelo del comportamiento esperado \\
-Nitsak y Bosak~\cite{nitsak2026} & Gemelo híbrido en compresores de 200 y 250\,kW & Modelo físico corregido con LSTM y datos de SCADA & Basado en la corriente del motor; un equipo por modelo \\
-Baskanbayeva et al.~\cite{baskanbayeva2026} & Gemelo termodinámico de un compresor para gas & Validado en campo & Orientado al desempeño estacional, no al mantenimiento \\
+Pinza Apolo et al.~\cite{pinzaapolo2026} & Monitoreo IIoT de un compresor scroll & Bajo costo; validado 49 días en operación & Umbrales y estadística, sin modelo del comportamiento esperado \\
+Nitsak y Bosak~\cite{nitsak2026} & Gemelo híbrido en compresores de 200 y 250\,kW & Modelo físico corregido con LSTM y datos de SCADA & Basado en la corriente del motor; un modelo por equipo \\
+Baskanbayeva et al.~\cite{baskanbayeva2026} & Gemelo termodinámico de un compresor para gas & Validado en campo & Orientado al desempeño, no al mantenimiento \\
 Talbi et al.~\cite{talbi2026}; Daoudi et al.~\cite{daoudi2025} & Diagnóstico con aprendizaje automático & Clasificación automática de fallas & Requiere datos de fallas etiquetados \\
 \hline
 \end{tabular}
@@ -29,8 +29,8 @@ Talbi et al.~\cite{talbi2026}; Daoudi et al.~\cite{daoudi2025} & Diagnóstico co
 
 \section{Marcos de referencia y normas}
 
-El marco PSAF del Digital Twin Consortium organiza un gemelo digital en una plataforma TI/OT, una representación virtual, interfaces de servicio y aplicaciones, y define sus mecanismos de sincronización \cite{dtc_psaf}; su tabla periódica de capacidades permite identificar las capacidades que requiere la solución \cite{dtc_cpt}. La norma IEC 62264, basada en ISA-95, ordena los componentes por niveles \cite{iec62264}; la ISO 13374, el procesamiento de datos de monitoreo de condición \cite{iso13374}; y la ISO 16290, la madurez tecnológica mediante la escala TRL \cite{iso16290}. Para la comunicación con el controlador se dispone de OPC UA \cite{iec62541,morato2020}, y para el intercambio de modelos entre herramientas, del estándar FMI \cite{blochwitz2012}.
+El PSAF del Digital Twin Consortium organiza un gemelo digital en plataforma TI/OT, representación virtual, interfaces de servicio y aplicaciones \cite{dtc_psaf}, y su tabla periódica de capacidades identifica las capacidades requeridas \cite{dtc_cpt}. La IEC 62264 (ISA-95) ordena los componentes por niveles \cite{iec62264}; la ISO 13374, el procesamiento de datos de monitoreo \cite{iso13374}; y la ISO 16290, la madurez tecnológica \cite{iso16290}. OPC UA \cite{iec62541} y FMI \cite{blochwitz2012} permiten intercambiar datos y modelos entre herramientas.
 
 \section{Brecha identificada}
 
-Las soluciones revisadas emplean umbrales sin modelo del comportamiento esperado, firmas eléctricas en compresores de gran potencia o modelos que requieren datos de fallas, y en su mayoría se desarrollan para un equipo en particular. En la revisión realizada no se identificó una plataforma configurable que, a partir de la configuración y del histórico de cada compresor de tornillo lubricado de velocidad fija, calibre un modelo del comportamiento térmico esperado y lo combine con indicadores de ciclaje y reglas expertas en un índice de salud interpretable, sobre una arquitectura basada en estándares abiertos.
+Las soluciones revisadas usan umbrales sin modelo esperado, firmas eléctricas o modelos que requieren datos de fallas, y en su mayoría atienden a un equipo en particular. No se identificó una plataforma configurable que calibre, con la configuración y el histórico de cada compresor de tornillo lubricado de velocidad fija, un modelo térmico esperado y lo combine con indicadores de ciclaje y reglas expertas en un índice de salud interpretable.
