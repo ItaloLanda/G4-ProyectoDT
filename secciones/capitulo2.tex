@@ -1,36 +1,20 @@
-% Capitulo II: Estado del arte (maximo 2 paginas)
+% Capitulo II: Estado del arte (maximo 2 paginas). Texto continuo, sin subtitulos por tema.
 
 \chapter{ESTADO DEL ARTE}
 
-\section{Gemelo digital y sombra digital}
+El gemelo digital se planteó como una representación virtual vinculada a un producto físico durante su ciclo de vida \cite{grieves2017,tao2019tii}. Kritzinger et al.~\cite{kritzinger2018} lo clasifican según el flujo de datos con el activo: el modelo digital no intercambia datos de forma automática; la sombra digital recibe datos del activo hacia el modelo; y el gemelo digital intercambia datos en ambos sentidos. En mantenimiento, estas representaciones se usan cada vez más para apoyar decisiones con datos de operación \cite{zhong2023}. El presente proyecto se ubica en el nivel de sombra digital, porque solo recibe datos del compresor y no actúa sobre él.
 
-El gemelo digital se planteó como una representación virtual vinculada a un producto físico durante su ciclo de vida \cite{grieves2017,tao2019tii}. Kritzinger et al.~\cite{kritzinger2018} distinguen el modelo digital, sin intercambio automático de datos; la sombra digital, con flujo automático del activo hacia el modelo; y el gemelo digital, con flujo en ambos sentidos, y su uso en mantenimiento es creciente \cite{zhong2023}.
+En compresores de tornillo lubricados, la literatura sigue dos caminos. Los modelos físicos explican su comportamiento térmico y de carga y descarga, pero se plantearon para diseño y optimización, no para supervisión. Por ejemplo, el estado de descarga se modeló en MATLAB y se validó con ensayos \cite{liang2019}, y en un compresor de 22\,kW se encontró que la temperatura de inyección del aceite, entre 40 y 60\,°C, influye en su desempeño \cite{kumar2022}. Los enfoques basados en datos clasifican fallas con redes neuronales o aprendizaje automático, aunque requieren registros de fallas etiquetados \cite{talbi2026,daoudi2025}. Nitsak y Bosak~\cite{nitsak2026} combinan ambos caminos en un gemelo híbrido validado con datos de SCADA de compresores de 200 y 250\,kW, pero trabajan con la corriente del motor y no con variables térmicas.
 
-\section{Soluciones existentes en compresores de tornillo}
+Entre las soluciones de monitoreo, Pinza Apolo et al.~\cite{pinzaapolo2026} implementaron un sistema IIoT de bajo costo para un compresor, con un PLC, Node-RED y almacenamiento en la nube, y lo validaron durante 49 días de operación con una línea base estadística y umbrales de referencia (Figura~\ref{fig:existentes}). Esta solución muestra que leer las variables del compresor es viable, pero evalúa cada variable por separado y no compara la temperatura con la que debería tener según las condiciones de operación.
 
-Los modelos físicos de compresores lubricados se orientan al diseño y no a la supervisión \cite{liang2019,kumar2022}, y los basados en datos requieren registros de fallas \cite{talbi2026,daoudi2025} (Tabla~\ref{tab:soluciones}).
-
-\begin{table}[H]
+\begin{figure}[htbp]
 \centering
-\caption{Comparación de soluciones existentes}
-\label{tab:soluciones}
-\footnotesize
-\begin{tabular}{p{2.3cm}p{3.3cm}p{3.5cm}p{3.7cm}}
-\hline
-\textbf{Fuente} & \textbf{Solución} & \textbf{Ventajas} & \textbf{Limitaciones} \\
-\hline
-Pinza Apolo et al.~\cite{pinzaapolo2026} & Monitoreo IIoT de un compresor scroll & Bajo costo; validado 49 días en operación & Umbrales sin modelo esperado \\
-Nitsak y Bosak~\cite{nitsak2026} & Gemelo híbrido en compresores de 200 y 250\,kW & Modelo físico corregido con LSTM y datos de SCADA & Basado en la corriente del motor; un modelo por equipo \\
-Baskanbayeva et al.~\cite{baskanbayeva2026} & Gemelo termodinámico de un compresor para gas & Validado en campo & Orientado al desempeño, no al mantenimiento \\
-Talbi et al.~\cite{talbi2026}; Daoudi et al.~\cite{daoudi2025} & Diagnóstico con aprendizaje automático & Clasificación automática de fallas & Requiere datos de fallas etiquetados \\
-\hline
-\end{tabular}
-\end{table}
+\includegraphics[width=0.95\textwidth]{fig_solucion_existente.pdf}
+\caption{Solución existente de monitoreo IIoT de un compresor: (a) arquitectura del sistema y (b) detección de anomalías con línea base estadística y umbral. Adaptado de Pinza Apolo et al. (2026), licencia CC BY 4.0}
+\label{fig:existentes}
+\end{figure}
 
-\section{Marcos de referencia y normas}
+Para diseñar este tipo de soluciones se dispone de marcos de referencia. La IEC 62264 (ISA-95) ordena los componentes de una planta por niveles \cite{iec62264}, y la ISO 13374 define las etapas del procesamiento de datos de monitoreo, desde la adquisición hasta la recomendación \cite{iso13374}. Para el intercambio de datos y modelos entre herramientas se cuenta con OPC UA \cite{iec62541} y FMI \cite{blochwitz2012}.
 
-El PSAF del Digital Twin Consortium estructura un gemelo digital en plataforma TI/OT, representación virtual, interfaces y aplicaciones \cite{dtc_psaf}, y su tabla periódica identifica sus capacidades \cite{dtc_cpt}. La IEC 62264 (ISA-95) ordena los componentes por niveles \cite{iec62264}; la ISO 13374, el procesamiento de datos de monitoreo \cite{iso13374}; y la ISO 16290, la madurez tecnológica \cite{iso16290}. OPC UA \cite{iec62541} y FMI \cite{blochwitz2012} facilitan la interoperabilidad.
-
-\section{Brecha identificada}
-
-Las soluciones revisadas usan umbrales, firmas eléctricas o datos de fallas, y atienden a un solo equipo. No se identificó una plataforma configurable que calibre con el histórico de cada compresor un modelo térmico esperado y lo combine con indicadores de ciclaje y reglas expertas en un índice de salud.
+Las soluciones revisadas usan umbrales, firmas eléctricas o datos de fallas, y atienden a un solo equipo. No se identificó una solución que calibre, con el histórico de cada compresor de tornillo lubricado, un modelo térmico esperado y lo combine con indicadores de ciclaje y reglas expertas en un índice de salud interpretable. Esta es la brecha que atiende el proyecto.
