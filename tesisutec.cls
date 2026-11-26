@@ -291,10 +291,10 @@
       \vspace{-1.5cm}
       {\large \textbf{UNIVERSIDAD DE INGENIERÍA Y TECNOLOGÍA}\par}
       \vspace{0.5cm}
-      {\large {CARRERA DE \deptname }\par}
+      {\large {CURSO DE ESPECIALIZACIÓN \deptname }\par}
       \vfill
-     
-      \href{https://www.utec.edu.pe}{\includegraphics[height=2.5cm]{images/logo_utec.png}}\\
+      \vspace{0.5cm}
+      \href{https://www.utec.edu.pe}{\includegraphics[height=3.5cm]{images/logo_utec.png}}\\
       \vfill
       \vspace{0.5cm}
       {\Large \bf \@title \par}
