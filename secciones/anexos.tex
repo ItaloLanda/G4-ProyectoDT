@@ -1,6 +1,69 @@
-\chapter*{\center \Large ANEXOS} 
-\addcontentsline{toc}{section}{\bfseries ANEXOS} 
-\markboth{ANEXOS}{ANEXOS} 
+\chapter*{\center \Large ANEXOS}
+\addcontentsline{toc}{section}{\bfseries ANEXOS}
+\markboth{ANEXOS}{ANEXOS}
+\setcounter{figure}{0}\renewcommand{\thefigure}{A.\arabic{figure}}
+\setcounter{table}{0}\renewcommand{\thetable}{A.\arabic{table}}
 
-\par Los algoritmos desarrollados .....
-    
+\section*{Anexo A. Verificación de la sombra digital con una planta virtual}
+\addcontentsline{toc}{subsection}{Anexo A. Verificación con una planta virtual}
+
+\textbf{Planta virtual.} Como aún no se cuenta con la serie de datos de un compresor conectado, la sombra se verificó con una planta virtual en MATLAB construida con los resultados de una auditoría energética de siete días a una planta industrial, cuyos datos se anonimizaron. De la auditoría se tomaron los datos de placa del compresor de tornillo lubricado (29,2\,cfm, 9,5\,kW en carga y 2,25\,kW en descarga), su banda de presión de 7,5 a 8,5\,bar, el volumen de sus tanques (1,5\,m$^3$) y el perfil de demanda medido: turno de 6:00 a 19:00 de lunes a viernes, consumo base de 3 a 5\,cfm, caudal medio de 6,86\,cfm y máximo de 20,78\,cfm.
+
+La planta virtual incluye condiciones que la sombra desconoce, para que la verificación no sea ideal: el compresor entrega 7\,\% menos aire que su caudal de placa, como ocurre en un equipo con años de uso; la presión se lee con un ruido de 0,02\,bar y una resolución de 0,01\,bar; y existen fugas que dependen de la presión, un retardo de la válvula de admisión y el paso a parada tras 6 minutos en descarga. La presión mínima de operación se fijó en 7,0\,bar. La sombra solo recibe la presión y el estado de carga, como los recibiría del controlador, y calcula con el caudal de placa.
+
+\textbf{Resultados.} La Tabla~\ref{tab:anx} compara la sombra con la planta virtual y con la auditoría.
+
+\begin{table}[htbp]
+\centering
+\caption{Resultados de la sombra frente a la planta virtual}
+\label{tab:anx}
+\footnotesize
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{|p{5.2cm}|p{2.2cm}|p{2.2cm}|p{2.0cm}|p{1.6cm}|}
+\hline
+\textbf{Indicador} & \textbf{Planta virtual} & \textbf{Sombra} & \textbf{Diferencia} & \textbf{Auditoría} \\ \hline
+Volumen efectivo [m$^3$] & 1,50 & 1,62 & +8\,\% & -- \\ \hline
+Tiempo en carga [\%] & 25,4 & 25,4 & 0,0 puntos & -- \\ \hline
+Ciclos por hora & 4,86 & 5,02 & +3\,\% & -- \\ \hline
+Demanda media [cfm] & 6,89 & 7,42 & +8\,\% & 6,86 \\ \hline
+Demanda máxima de 15 min [cfm] & 21,7 & 23,0 & +6\,\% & 20,78 \\ \hline
+Consumo base [cfm] & 3,5 & 3,7 & +7\,\% & 3 a 5 \\ \hline
+Margen ante más demanda [cfm] & 10 & 10 & 0 & -- \\ \hline
+Ciclos por hora con +1\,m$^3$ & -- & 3,1 & -- & -- \\ \hline
+Semana de la alerta de condición & -- & 8 & -- & -- \\ \hline
+\end{tabular}
+\end{table}
+
+El volumen efectivo y la demanda resultan 7 a 8\,\% mayores que los de la planta. La causa es el caudal de placa: como el compresor entrega 7\,\% menos aire, la sombra atribuye la subida de presión a un volumen mayor y la bajada a una demanda mayor. La auditoría tiene el mismo sesgo, porque también estima el caudal con los datos del fabricante. En cambio, el tiempo en carga y los ciclos dependen del estado y de la presión, por lo que coinciden con los de la planta (Figura~\ref{fig:anx_estado}).
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\textwidth]{fig_anx_estado.pdf}
+\caption{Presión registrada y demanda deducida por la sombra}
+\label{fig:anx_estado}
+\end{figure}
+
+El margen ante una demanda adicional fue de 10\,cfm en ambos casos (Figura~\ref{fig:anx_capacidad}), porque la sombra sobrestima en la misma proporción la demanda y la capacidad del compresor. Con una demanda adicional de 35\,cfm la presión queda bajo 7,0\,bar todo el tiempo. Un tanque de 1\,m$^3$ adicional reduce los ciclos de 5,0 a 3,1 por hora y el tiempo en descarga de 42,5 a 30,9\,\%, pero eleva el margen solo a 11\,cfm.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\textwidth]{fig_anx_capacidad.pdf}
+\caption{Tiempo con presión baja ante una demanda adicional}
+\label{fig:anx_capacidad}
+\end{figure}
+
+En la prueba de condición se simularon doce semanas con una pérdida de caudal de 2\,\% por semana desde la semana 6. El volumen efectivo se mantuvo en 1,62\,m$^3$ mientras el equipo no cambió y aumentó con la pérdida; la alerta, fijada en un aumento de 5\,\%, se activó en la semana 8, con una pérdida de 6\,\% (Figura~\ref{fig:anx_condicion}).
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\textwidth]{fig_anx_condicion.pdf}
+\caption{Volumen efectivo semanal ante una pérdida de caudal}
+\label{fig:anx_condicion}
+\end{figure}
+
+\textbf{Limitaciones.} La demanda absoluta depende de que el caudal de placa sea correcto; una medición puntual de caudal al instalar la sombra permitiría corregir ese valor. La verificación usa una planta virtual y no datos de un compresor conectado; su validación en planta queda como etapa posterior al proyecto.
+
+\section*{Anexo B. Fuentes de las imágenes}
+\addcontentsline{toc}{subsection}{Anexo B. Fuentes de las imágenes}
+
+Las fotografías de compresor y de la interfaz móvil de la matriz morfológica y de la arquitectura provienen del sitio web del fabricante (atlascopco.com). Las demás imágenes provienen de Wikimedia Commons: pinza amperimétrica (Harke, dominio público), registrador de datos (MSRDatenlogger, CC BY-SA 3.0), caudalímetro térmico (Huangmanyun, CC BY-SA 4.0), tubo Pitot (Kolossos, CC BY-SA 3.0), termopar (Harke, CC BY-SA 3.0), memoria USB (Dori, dominio público), cable Ethernet (Khairil Yusof, CC BY 2.0), logotipos de MATLAB y Python, computador de placa única (Laserlicht, CC BY-SA 4.0) y sala de control (Z22, CC BY-SA 4.0). Los íconos restantes son de elaboración propia.

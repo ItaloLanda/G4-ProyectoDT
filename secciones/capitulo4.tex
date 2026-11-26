@@ -2,69 +2,57 @@
 
 \chapter{RESULTADOS ESPERADOS}
 
-Este capítulo expone el desempeño esperado de la sombra digital seleccionada (P2) a partir de la simulación del Capítulo III. No busca validar una teoría, sino mostrar que la solución es funcional, segura y coherente con el problema planteado. Los resultados se obtuvieron con la planta virtual construida con los datos de la auditoría.
+Este capítulo describe cómo funcionaría la sombra digital seleccionada (P2) en una planta y para qué serviría a cada grupo de interés. No busca validar una teoría, sino mostrar que la solución es funcional, segura y coherente con el problema planteado. La verificación del modelo con una planta virtual, con sus errores, se presenta en el Anexo A.
 
 \section{Solución funcional}
 
-La sombra digital cumple el objetivo con tres funciones, cada una ilustrada con un ejemplo.
+\textbf{Funcionamiento esperado.} Una vez conectada, la sombra lee del controlador el estado de carga, la presión y las temperaturas cada 2\,s y guarda los últimos siete días. Cada semana se recalibra con ese histórico: de la velocidad con que sube y baja la presión obtiene el volumen efectivo del sistema y la demanda de la planta. Con el modelo calibrado entrega tres resultados, cada uno dirigido a un grupo de interés:
 
-\textbf{Estado actual.} Con siete días de presión y estado de carga, la sombra estimó un volumen efectivo de 1,50\,m$^3$, igual al de los tanques, y reconstruyó la demanda de la planta (Figura~\ref{fig:estado}). En la semana, el compresor estuvo 23,6\,\% del tiempo en carga, 43,2\,\% en descarga y 33,2\,\% parado, con 5,0 ciclos por hora. La demanda media deducida fue de 6,90\,cfm, el pico de 15 minutos de 21,5\,cfm y el consumo base de 3,5\,cfm, cercanos a los valores de la auditoría: 6,86\,cfm de media, 20,78\,cfm de máximo y una base de 3 a 5\,cfm. Al reproducir la semana, el tiempo en carga difirió en 0,1 puntos y los ciclos por hora en 3\,\%.
+\begin{itemize}
+\item \textbf{Estado actual}, para el servicio técnico: tiempos de carga, descarga y parada, ciclos por hora y perfil de demanda, que hoy se obtienen solo con una auditoría.
+\item \textbf{Capacidad ante una demanda adicional o un tanque mayor}, para el cliente: antes de instalar un equipo nuevo, indica si el compresor lo soporta sin que la presión baje de la mínima, y cuánto cambian los ciclos con un tanque adicional.
+\item \textbf{Alerta de condición}, para mantenimiento: si el volumen efectivo calculado aumenta sin que se haya cambiado la red, el compresor está entregando menos aire y se programa una revisión.
+\end{itemize}
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.85\textwidth]{fig_res_estado.pdf}
-\caption{Estado actual estimado por la sombra}
-\label{fig:estado}
-\end{figure}
-
-\textbf{Capacidad ante una mayor demanda.} La sombra respondió la pregunta del cliente: ¿soporta el compresor una demanda adicional? Con el criterio de que la presión no baje de 7,0\,bar más del 1\,\% del tiempo, la sombra estimó un margen de 12\,cfm adicionales, igual al de la planta virtual (Figura~\ref{fig:capacidad}). Por tanto, el equipo nuevo de 35\,cfm proyectado en la auditoría no puede atenderse con este compresor: la presión quedaría bajo 7,0\,bar todo el tiempo y se requiere más caudal instalado. El mismo modelo mostró que un tanque de 1\,m$^3$ adicional reduce los ciclos de 5,2 a 3,1 por hora y el tiempo en descarga de 43,9 a 31,2\,\%, pero solo eleva el margen a 13\,cfm: el tanque mejora la operación, mientras que la demanda adicional exige más caudal.
+\textbf{Plataforma de la sombra digital.} Los resultados se muestran en una aplicación de escritorio desarrollada en MATLAB, con tres pestañas: estado actual, escenarios y condición (Figura~\ref{fig:plataforma}). La figura presenta la interfaz con los datos de la verificación del Anexo A, que reproduce un compresor de 29,2\,cfm con el perfil de demanda de una auditoría energética.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.85\textwidth]{fig_res_capacidad.pdf}
-\caption{Margen ante una demanda adicional}
-\label{fig:capacidad}
+\includegraphics[width=\textwidth]{fig_plataforma.pdf}
+\caption{Interfaz de la sombra digital}
+\label{fig:plataforma}
 \end{figure}
 
-\textbf{Alerta de condición.} Durante doce semanas se simuló una pérdida gradual de caudal desde la semana 6. El volumen efectivo calculado se mantuvo en 1,51\,m$^3$ mientras el equipo estuvo sano y aumentó con la pérdida de caudal; la alerta, fijada en un aumento de 5\,\%, se activó en la semana 8, con una pérdida de 6\,\% (Figura~\ref{fig:condicion}).
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.85\textwidth]{fig_res_condicion.pdf}
-\caption{Alerta de condición por pérdida de caudal}
-\label{fig:condicion}
-\end{figure}
+En la pestaña de estado, los indicadores resumen la semana: el compresor estuvo 25\,\% del tiempo en carga, 42\,\% en descarga y 33\,\% parado, con una demanda media de 7,4\,cfm que se concentra en el turno de 6:00 a 19:00. En la pestaña de escenarios, el usuario ingresa la demanda del equipo que planea instalar y el volumen del tanque; la sombra simula la semana con esos cambios y calcula el tiempo con presión baja. En el ejemplo, el margen del compresor es de unos 10\,cfm, por lo que un equipo nuevo de 35\,cfm no podría atenderse y se requiere más caudal instalado; un tanque adicional de 1\,m$^3$ reduce los ciclos de 5,0 a 3,1 por hora, pero casi no aumenta el margen. En la pestaña de condición, el volumen efectivo semanal se compara con su valor de referencia y, al superar en 5\,\% ese valor, la aplicación sugiere revisar el caudal del compresor.
 
 \section{Solución segura}
 
-La sombra solo lee los datos del controlador; no modifica consignas ni protecciones, por lo que las alarmas y paradas del compresor se mantienen. Los datos del cliente se anonimizan antes de cualquier análisis. Su principal limitación es que el caudal se calcula con los datos de placa: si el compresor perdió caudal, la demanda y el margen se sobrestiman. La alerta de condición cubre este riesgo, porque avisa cuando el volumen efectivo crece sin que haya cambiado la red.
+La sombra solo lee los datos del controlador; no modifica consignas ni protecciones, por lo que las alarmas y paradas del compresor se mantienen. Los datos del cliente se anonimizan antes de cualquier análisis. Su principal limitación es que el caudal se calcula con los datos de placa: si el compresor entrega menos aire, la demanda calculada aumenta en la misma proporción, como se observa en el Anexo A. El margen ante una demanda adicional no se afecta, porque la demanda y la capacidad se expresan con la misma referencia, y la alerta de condición avisa cuando esa diferencia crece.
 
 \section{Solución coherente con el problema}
 
-La Tabla~\ref{tab:cumple} contrasta los resultados con los requerimientos.
+La Tabla~\ref{tab:cumple} relaciona cada requerimiento con la función o el elemento de diseño que lo atiende.
 
 \begin{table}[htbp]
 \centering
-\caption{Cumplimiento de requerimientos}
+\caption{Atención de los requerimientos}
 \label{tab:cumple}
 \footnotesize
 \renewcommand{\arraystretch}{1.25}
-\begin{tabular}{|p{0.7cm}|p{4.8cm}|p{6.2cm}|p{1.8cm}|}
+\begin{tabular}{|p{0.7cm}|p{4.6cm}|p{6.4cm}|p{1.8cm}|}
 \hline
-\textbf{ID} & \textbf{Criterio} & \textbf{Resultado esperado} & \textbf{Estado} \\ \hline
-R1 & Estado actual; error de carga menor a 2 puntos & Carga con 0,1 puntos de diferencia; ciclos con 3\,\% & Cumple \\ \hline
-R2 & Margen que no supere al real & 12\,cfm estimados, igual a la planta virtual & Cumple \\ \hline
-R3 & Cambio de ciclos con un tanque mayor & De 5,2 a 3,1 ciclos por hora & Cumple \\ \hline
-R4 & Alerta antes de 10\,\% de pérdida & Alerta con 6\,\% de pérdida & Cumple \\ \hline
-R5 & Acceso de solo lectura & Sin órdenes al controlador & Por diseño \\ \hline
-R6 & Sin sensores; un dato cada 30\,s o menos & Datos del controlador cada 2\,s & Por diseño \\ \hline
-R7 & Datos que llegan solos & Lectura continua por OPC UA & Por diseño \\ \hline
+\textbf{ID} & \textbf{Requerimiento} & \textbf{Cómo lo atiende la solución} & \textbf{Evidencia} \\ \hline
+R1 & Estado actual del compresor & Pestaña de estado con tiempos, ciclos y demanda & Anexo A \\ \hline
+R2 & Margen ante más demanda & Escenario de demanda adicional con criterio de presión mínima & Anexo A \\ \hline
+R3 & Efecto de un tanque adicional & Escenario de tanque con cambio de ciclos & Anexo A \\ \hline
+R4 & Pérdida de caudal & Seguimiento semanal del volumen efectivo & Anexo A \\ \hline
+R5 & Sin interferir con el control & Lectura OPC UA de solo lectura & Diseño \\ \hline
+R6 & Sin sensores adicionales & Datos del controlador cada 2\,s & Diseño \\ \hline
+R7 & Evaluación sin visitas & Conexión permanente y recalibración semanal & Diseño \\ \hline
 \end{tabular}
 \end{table}
 
-\textbf{¿Es una sombra digital?} Según Kritzinger et al.~\cite{kritzinger2018}, una sombra digital recibe datos del activo de forma automática, mientras que las decisiones vuelven al activo de forma manual. La P2 cumple ambas condiciones: los datos viajan solos del controlador a la sombra por OPC UA, y la decisión de aumentar la demanda, instalar un tanque o programar una visita la toma el personal. En cambio, la auditoría manual (P1) sería un modelo digital, porque los datos se cargan a mano.
-
-\textbf{Capacidades.} La Figura~\ref{fig:cpt} marca las capacidades de la tabla periódica del Digital Twin Consortium que cumple la solución. Se concentran en servicios de datos, como la adquisición y el almacenamiento, y en inteligencia, como la simulación, la predicción y las alertas. No incluye capacidades de mando, inteligencia artificial ni realidad extendida, porque el alcance es una sombra de solo lectura.
+\textbf{Capacidades del Digital Twin Consortium.} La Figura~\ref{fig:cpt} marca las capacidades de la tabla periódica que cumple la sombra digital, y la Tabla~\ref{tab:capacidades} describe el resultado esperado de cada una. Se concentran en servicios de datos e inteligencia; no se incluyen capacidades de mando, inteligencia artificial ni realidad extendida, porque el alcance es una sombra de solo lectura.
 
 \begin{figure}[htbp]
 \centering
@@ -74,4 +62,29 @@ R7 & Datos que llegan solos & Lectura continua por OPC UA & Por diseño \\ \hlin
 \par\vspace{2pt}{\footnotesize Fuente: adaptado de Digital Twin Consortium (2024).}
 \end{figure}
 
-Los resultados se obtuvieron con una planta virtual basada en una auditoría; su validación con los datos del controlador de un compresor en operación queda como etapa posterior a este proyecto.
+\begin{table}[htbp]
+\centering
+\caption{Categorías, capacidades y resultado esperado}
+\label{tab:capacidades}
+\footnotesize
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{|p{2.3cm}|p{3.6cm}|p{8.1cm}|}
+\hline
+\textbf{Categoría} & \textbf{Capacidad} & \textbf{Resultado esperado} \\ \hline
+\multirow{5}{2.3cm}{Servicios de datos} & Adquisición e ingesta & Lectura por OPC UA del estado, la presión y las temperaturas cada 2\,s, sin sensores adicionales. \\ \cline{2-3}
+ & Transformación y contextualización & Conversión de la presión y el estado en tramos de carga y descarga asociados al equipo y a su caudal de placa. \\ \cline{2-3}
+ & Procesamiento por lotes y agregación & Recalibración semanal con los últimos siete días y resúmenes por hora y por semana. \\ \cline{2-3}
+ & Generación de datos sintéticos & Semanas de operación simuladas para cada escenario de demanda o de tanque. \\ \cline{2-3}
+ & Almacenamiento y repositorio de simulación & Histórico de siete días y modelo calibrado de cada semana. \\ \hline
+Integración & Integración con sistemas OT & Conexión de solo lectura al softPLC por Ethernet, en los niveles 0 a 3 de ISA-95. \\ \hline
+\multirow{4}{2.3cm}{Inteligencia} & Análisis de datos y matemático & Volumen efectivo y demanda obtenidos de las pendientes de presión. \\ \cline{2-3}
+ & Simulación & Reproducción de la semana y simulación de demanda adicional y tanque. \\ \cline{2-3}
+ & Predicción & Tiempo con presión baja que tendría la planta con una demanda futura. \\ \cline{2-3}
+ & Reglas de negocio, alertas y reportes & Criterio de 1\,\% del tiempo bajo la presión mínima, alerta por aumento de 5\,\% del volumen efectivo y reporte semanal. \\ \hline
+Experiencia de usuario & Visualización básica y tableros & Aplicación de escritorio con indicadores, tendencias y escenarios. \\ \hline
+Gestión & Monitoreo del sistema y registro de eventos & Estado de la conexión, hora de la última lectura y registro de alertas. \\ \hline
+Confiabilidad & Seguridad operativa y privacidad & Acceso de solo lectura al controlador y anonimización de los datos del cliente. \\ \hline
+\end{tabular}
+\end{table}
+
+\textbf{¿Es una sombra digital?} Según Kritzinger et al.~\cite{kritzinger2018}, una sombra digital recibe datos del activo de forma automática, mientras que las decisiones vuelven al activo de forma manual. La P2 cumple ambas condiciones: los datos viajan solos del controlador a la sombra por OPC UA, y la decisión de aumentar la demanda, instalar un tanque o programar una visita la toma el personal. En cambio, la auditoría manual (P1) sería un modelo digital, porque los datos se cargan a mano. Por tanto, la solución propuesta es una sombra digital.

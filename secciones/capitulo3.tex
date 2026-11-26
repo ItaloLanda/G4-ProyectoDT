@@ -40,25 +40,12 @@ R7 & Cliente & Mantener la evaluación actualizada sin visitas & Datos que llega
 
 La función general de la solución es convertir los datos de operación del compresor en una evaluación de su capacidad. Esta función se dividió en nueve subfunciones, ordenadas según el recorrido del dato: medir, transmitir, adquirir, modelar y mostrar. Las alternativas de cada subfunción se tomaron de la práctica de las auditorías energéticas, en las que se registran la corriente y la presión durante siete días \cite{cac2026}, y de los medios que ofrece el propio compresor. La Tabla~\ref{tab:morfo} presenta la matriz y las cuatro propuestas que resultan de recorrerla.
 
-\begin{table}[htbp]
+\begin{table}[p]
 \centering
 \caption{Matriz morfológica y propuestas de solución}
 \label{tab:morfo}
-\scriptsize
-\renewcommand{\arraystretch}{1.25}
-\begin{tabular}{|p{2.6cm}|p{3.55cm}|p{3.55cm}|p{3.55cm}|}
-\hline
-\textbf{Subfunción} & \textbf{A} & \textbf{B} & \textbf{C} \\ \hline
-1. Estado de carga & Pinza de corriente con registro {\bfseries [P1]} & Medidor trifásico de potencia {\bfseries [P4]} & Estado del controlador {\bfseries [P2, P3]} \\ \hline
-2. Presión & Sensor con batería y registro {\bfseries [P1, P4]} & Sensor del controlador {\bfseries [P2, P3]} & Transmisor cableado 4--20\,mA \\ \hline
-3. Caudal & Indirecto: estado o corriente y datos de placa {\bfseries [P1, P2, P3]} & Caudalímetro térmico & Pitot multivariable {\bfseries [P4]} \\ \hline
-4. Temperatura & Sensor del controlador {\bfseries [P2, P3]} & Termopar tipo K {\bfseries [P1]} & Pitot multivariable {\bfseries [P4]} \\ \hline
-5. Medio físico & Memoria USB {\bfseries [P1, P4]} & Cobre, Ethernet {\bfseries [P2]} & Inalámbrico {\bfseries [P3]} \\ \hline
-6. Adquisición & Registradores portátiles {\bfseries [P1, P4]} & SoftPLC del compresor {\bfseries [P2]} & Módulo inalámbrico {\bfseries [P3]} \\ \hline
-7. Transferencia & Archivo CSV {\bfseries [P1, P4]} & MQTT {\bfseries [P3]} & OPC UA {\bfseries [P2]} \\ \hline
-8. Plataforma & MATLAB/Simulink {\bfseries [P2, P4]} & Python {\bfseries [P1]} & Ansys Twin Builder {\bfseries [P3]} \\ \hline
-9. Resultados & Reporte {\bfseries [P1, P4]} & App de escritorio {\bfseries [P2]} & Tablero web {\bfseries [P3]} \\ \hline
-\end{tabular}
+\includegraphics[width=0.84\textwidth]{fig_matriz_morfologica.pdf}
+\par\vspace{2pt}{\footnotesize Fuente: elaboración propia; imágenes del fabricante y de Wikimedia Commons (Anexo B).}
 \end{table}
 
 Las propuestas son: P1, auditoría manual, que corresponde a la práctica actual; P2, sombra conectada al softPLC del compresor por Ethernet; P3, sombra remota por el módulo inalámbrico del compresor; y P4, auditoría portátil instrumentada, que mide el caudal con un Pitot multivariable. P1 y P4 requieren cargar los datos a mano, mientras que en P2 y P3 los datos llegan solos.
@@ -107,6 +94,7 @@ La Figura~\ref{fig:isa95} ubica los componentes de la P2 en los niveles de la IE
 \includegraphics[width=\textwidth]{fig_arquitectura_p2.pdf}
 \caption{Arquitectura de la P2 según ISA-95}
 \label{fig:isa95}
+\par\vspace{2pt}{\footnotesize Fuente: elaboración propia; imágenes del fabricante y de Wikimedia Commons (Anexo B).}
 \end{figure}
 
 \section{Modelo de la sombra digital}
@@ -115,8 +103,8 @@ El modelo representa el balance de aire entre el compresor, la demanda de la pla
 
 La sombra funciona en tres pasos. Primero, se calibra con siete días de datos: estado de carga, presión y caudal de placa. Segundo, reproduce la operación de esa semana para comprobar que el modelo representa al equipo. Tercero, simula escenarios: una demanda adicional, un tanque más grande o el seguimiento semanal del volumen efectivo, que aumenta cuando el compresor pierde caudal. Las alarmas y paradas siguen a cargo del controlador.
 
-Como aún no se cuenta con la serie de datos de un compresor conectado, la verificación se realiza con una planta virtual en MATLAB construida con los resultados de una auditoría energética de siete días a una planta industrial, cuyos datos se anonimizaron. De la auditoría se tomaron los datos de placa del compresor de tornillo lubricado (29,2\,cfm, 9,5\,kW en carga y 2,25\,kW en descarga), su banda de presión de 7,5 a 8,5\,bar, el volumen de sus tanques (1,5\,m$^3$) y el perfil de demanda medido: turno de 6:00 a 19:00 de lunes a viernes, consumo base de 3 a 5\,cfm, caudal medio de 6,86\,cfm y máximo de 20,78\,cfm. La planta virtual agrega lo que la auditoría no reporta: fugas que dependen de la presión, un retardo de la válvula de admisión y el paso a parada tras 6 minutos en descarga; además, se fija en 7,0\,bar la presión mínima de operación. La sombra solo recibe de ella la presión y el estado de carga, como los recibiría del controlador.
+Como aún no se cuenta con la serie de datos de un compresor conectado, el modelo se verifica con una planta virtual en MATLAB construida con los resultados de una auditoría energética de siete días. La planta incluye condiciones que la sombra desconoce, como un caudal real menor al de placa y el ruido del sensor de presión. Su descripción y sus resultados se presentan en el Anexo A.
 
 \section{Plan de verificación y evaluación del producto}
 
-La verificación compara los resultados de la sombra con los de la planta virtual y con los de la auditoría para cada requerimiento de la Tabla~\ref{tab:req}. Después se evalúa el producto con dos referencias. La clasificación de Kritzinger et al.~\cite{kritzinger2018} distingue el modelo, la sombra y el gemelo digital según el sentido en que fluyen los datos. La tabla periódica de capacidades del Digital Twin Consortium agrupa alrededor de 60 capacidades en seis categorías: servicios de datos, integración, inteligencia, experiencia de usuario, gestión y confiabilidad \cite{dtc_cpt}; se marca cuáles cumple la solución.
+La verificación compara los resultados de la sombra con los de la planta virtual y con los de la auditoría para cada requerimiento de la Tabla~\ref{tab:req} (Anexo A). Después se evalúa el producto con dos referencias. La clasificación de Kritzinger et al.~\cite{kritzinger2018} distingue el modelo, la sombra y el gemelo digital según el sentido en que fluyen los datos. La tabla periódica de capacidades del Digital Twin Consortium agrupa alrededor de 60 capacidades en seis categorías: servicios de datos, integración, inteligencia, experiencia de usuario, gestión y confiabilidad \cite{dtc_cpt}; se marca cuáles cumple la solución.
