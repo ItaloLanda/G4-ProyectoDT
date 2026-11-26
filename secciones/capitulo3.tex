@@ -4,18 +4,18 @@
 
 \section{Marco referencial de metodologías aplicadas}
 
-La ruta del proyecto tiene cinco pasos (Figura~\ref{fig:ruta}): definir los requerimientos, evaluar alternativas y elegir una, diseñar la arquitectura, diseñar el modelo y el flujo de datos, y verificar la solución frente a los requerimientos. La guía general es la directriz VDI 2206, porque ordena el paso de los requerimientos a la verificación en sistemas ciberfísicos \cite{vdi2206,graessler2020}. Además, se aplican dos marcos a partes concretas del diseño: la IEC 62264 (ISA-95), para ubicar por niveles el compresor, su controlador, el gateway y la sombra digital \cite{iec62264}; y la ISO 13374, que organiza el procesamiento de datos en adquisición, manipulación, detección de estado, evaluación de salud y recomendación \cite{iso13374}, etapas que corresponden a los módulos de la sombra digital. No se emplean otras metodologías, porque no aportan decisiones al diseño de este proyecto.
+El proyecto sigue el modelo en V de la directriz VDI 2206, que ordena el desarrollo de sistemas ciberfísicos desde los requerimientos hasta la verificación \cite{vdi2206,graessler2020}. La Figura~\ref{fig:modelov} muestra las metodologías empleadas y su orden. En el lado izquierdo se definen los requerimientos y se diseña el sistema con una matriz morfológica, cuyas propuestas se comparan con la evaluación técnico-económica de la VDI 2225 \cite{vdi2225}. En la base, la propuesta elegida se organiza por niveles con la IEC 62264 (ISA-95) \cite{iec62264} y se modela en MATLAB/Simulink. En el lado derecho se verifica el cumplimiento de los requerimientos y, al final, se evalúa el producto con tres referencias: la clasificación de Kritzinger et al.~\cite{kritzinger2018}, para confirmar que la solución es una sombra digital; la tabla periódica de capacidades del Digital Twin Consortium \cite{dtc_cpt}; y la Toolbox Industria 4.0 \cite{vdma2016}.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{fig_ruta_metodologica.pdf}
-\caption{Ruta metodológica del proyecto}
-\label{fig:ruta}
+\includegraphics[width=\textwidth]{fig_modelo_v.pdf}
+\caption{Marco referencial de las metodologías del proyecto sobre el modelo en V de la VDI 2206}
+\label{fig:modelov}
 \end{figure}
 
 \section{Requerimientos de la solución}
 
-Los requerimientos se derivaron del problema y de los grupos de interés del Capítulo I (Tabla~\ref{tab:req}).
+Los requerimientos se derivaron de la situación problemática y de los grupos de interés del Capítulo I. Cada uno tiene un criterio que se verifica en el Capítulo IV (Tabla~\ref{tab:req}).
 
 \begin{table}[htbp]
 \centering
@@ -23,122 +23,100 @@ Los requerimientos se derivaron del problema y de los grupos de interés del Cap
 \label{tab:req}
 \footnotesize
 \renewcommand{\arraystretch}{1.3}
-\begin{tabular}{|p{0.7cm}|p{2.2cm}|p{6.0cm}|p{4.2cm}|}
+\begin{tabular}{|p{0.7cm}|p{2.3cm}|p{6.2cm}|p{4.6cm}|}
 \hline
 \textbf{ID} & \textbf{Grupo} & \textbf{Requerimiento} & \textbf{Criterio de verificación} \\ \hline
-R1 & Mantenimiento & Detectar desviaciones térmicas antes del aviso del controlador & Anticipación mínima de 7 días \\ \hline
-R2 & Mantenimiento & Detectar un aumento sostenido de los ciclos de carga y descarga & Alerta ante un aumento de 20\,\% \\ \hline
-R3 & Producción & Evitar alertas sin causa & Menos del 5\,\% del tiempo fuera de verde sin falla \\ \hline
-R4 & Operación & No interferir con el control ni las protecciones & Acceso de solo lectura \\ \hline
-R5 & Mantenimiento & Presentar la información de forma comprensible & Índice de 0 a 100, causa y acción \\ \hline
-R6 & Servicio técnico & Usar las variables que ya registra el controlador & Sin sensores adicionales \\ \hline
-R7 & Servicio técnico & Ajustarse a cada equipo con su propio histórico & Calibración con 14 días de datos \\ \hline
-R8 & Mantenimiento & Contar con un modelo de referencia confiable & RMSE de validación menor a 2\,K \\ \hline
+R1 & Servicio técnico & Conocer el estado actual del compresor & Carga, descarga, parada, ciclos y demanda por hora, con error de carga menor a 2 puntos \\ \hline
+R2 & Cliente & Saber si el compresor soporta un aumento de demanda & Margen estimado que no supere al real \\ \hline
+R3 & Cliente & Evaluar el efecto de un tanque adicional & Cambio de ciclos por hora \\ \hline
+R4 & Servicio técnico & Advertir la pérdida de caudal del compresor & Alerta antes de una pérdida de 10\,\% \\ \hline
+R5 & Operación & No interferir con el control ni las protecciones & Acceso de solo lectura \\ \hline
+R6 & Servicio técnico & Usar los datos que ya registra el compresor & Sin sensores adicionales; un dato cada 30\,s o menos \\ \hline
+R7 & Cliente & Mantener la evaluación actualizada sin visitas & Datos que llegan solos a la sombra \\ \hline
 \end{tabular}
 \end{table}
 
-\section{Evaluación y selección de la solución}
+\section{Matriz morfológica}
 
-Se plantearon tres alternativas. La V1 es un monitoreo básico, con exportación de archivos y umbrales fijos. La V2 es una sombra digital con un gateway de borde, un modelo de comportamiento normal calibrado con el histórico del equipo y reglas expertas. La V3 es un gemelo digital avanzado, con modelo físico detallado, aprendizaje automático y acción automática sobre el controlador. Se evaluaron con criterios ponderados derivados de los requerimientos (Tabla~\ref{tab:eval}), con puntajes de 1 a 5; el valor técnico es el puntaje ponderado dividido entre el máximo posible.
+La función general de la solución es convertir los datos de operación del compresor en una evaluación de su capacidad. Esta función se dividió en nueve subfunciones, ordenadas según el recorrido del dato: medir, transmitir, adquirir, modelar y mostrar. Las alternativas de cada subfunción se tomaron de la práctica de las auditorías energéticas, en las que se registran la corriente y la presión durante siete días \cite{cac2026}, y de los medios que ofrece el propio compresor. La Tabla~\ref{tab:morfo} presenta la matriz y las cuatro propuestas que resultan de recorrerla.
 
 \begin{table}[htbp]
 \centering
-\caption{Evaluación ponderada de las alternativas}
-\label{tab:eval}
-\footnotesize
-\renewcommand{\arraystretch}{1.3}
-\begin{tabular}{|p{5.6cm}|c|c|c|c|}
+\caption{Matriz morfológica y propuestas de solución}
+\label{tab:morfo}
+\scriptsize
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{|p{2.5cm}|p{2.95cm}|p{2.95cm}|p{2.95cm}|p{2.3cm}|}
 \hline
-\textbf{Criterio} & \textbf{Peso} & \textbf{V1} & \textbf{V2} & \textbf{V3} \\ \hline
-Capacidad de anticipación (R1, R2) & 0,30 & 2 & 5 & 5 \\ \hline
-Seguridad operativa (R4) & 0,20 & 5 & 5 & 2 \\ \hline
-Factibilidad con datos disponibles (R6, R7) & 0,20 & 5 & 4 & 2 \\ \hline
-Facilidad de interpretación (R5) & 0,15 & 4 & 4 & 3 \\ \hline
-Simplicidad de implementación & 0,15 & 4 & 3 & 1 \\ \hline
-\textbf{Valor técnico} & & \textbf{0,76} & \textbf{0,87} & \textbf{0,58} \\ \hline
+\textbf{Subfunción} & \textbf{A} & \textbf{B} & \textbf{C} & \textbf{D} \\ \hline
+1. Estado de carga & Pinza de corriente con registro {\bfseries [P1]} & Medidor trifásico de potencia {\bfseries [P4]} & Estado del controlador {\bfseries [P2, P3]} & \\ \hline
+2. Presión & Sensor con batería y registro {\bfseries [P1, P4]} & Sensor del controlador {\bfseries [P2, P3]} & Transmisor cableado 4--20\,mA & \\ \hline
+3. Caudal & Indirecto: estado o corriente y datos de placa {\bfseries [P1, P2, P3]} & Caudalímetro térmico & Pitot multivariable {\bfseries [P4]} & \\ \hline
+4. Temperatura & Sensor del controlador {\bfseries [P2, P3]} & Termopar tipo K {\bfseries [P1]} & Pitot multivariable {\bfseries [P4]} & \\ \hline
+5. Medio físico & Memoria USB {\bfseries [P1, P4]} & Cobre, Ethernet {\bfseries [P2]} & Inalámbrico {\bfseries [P3]} & \\ \hline
+6. Adquisición & Registradores portátiles {\bfseries [P1, P4]} & SoftPLC del compresor {\bfseries [P2]} & Módulo inalámbrico {\bfseries [P3]} & \\ \hline
+7. Transferencia & Archivo CSV {\bfseries [P1, P4]} & Modbus TCP & OPC UA {\bfseries [P2]} & MQTT {\bfseries [P3]} \\ \hline
+8. Plataforma & MATLAB/Simulink {\bfseries [P2, P4]} & Python {\bfseries [P1]} & Ansys Twin Builder {\bfseries [P3]} & \\ \hline
+9. Resultados & Reporte {\bfseries [P1, P4]} & App de escritorio {\bfseries [P2]} & Tablero web {\bfseries [P3]} & Escena 3D \\ \hline
 \end{tabular}
 \end{table}
 
-Los pesos y puntajes son valoraciones de diseño del equipo, no mediciones. La V2 obtuvo el mayor valor técnico: frente a V1, detecta que la temperatura se aleja de lo esperado aunque siga dentro del rango permitido, y frente a V3, no actúa sobre el controlador y no necesita datos de fallas que no están disponibles. Según Kritzinger et al.~\cite{kritzinger2018}, la V2 es una sombra digital, ya que los datos fluyen del compresor al modelo y la decisión queda en manos del personal.
+Las propuestas son: P1, auditoría manual, que corresponde a la práctica actual; P2, sombra conectada al softPLC del compresor por Ethernet; P3, sombra remota por el módulo inalámbrico del compresor; y P4, auditoría portátil instrumentada, que mide el caudal con un Pitot multivariable. P1 y P4 requieren cargar los datos a mano, mientras que en P2 y P3 los datos llegan solos.
 
-\section{Arquitectura}
+\section{Evaluación de las propuestas según la VDI 2225}
 
-La Figura~\ref{fig:isa95} ubica los componentes en los niveles de la IEC 62264. El compresor y sus sensores forman el nivel 0; su controlador con softPLC, que conserva la regulación y las protecciones, el nivel 1. En el nivel 2, un gateway de borde lee el controlador por Ethernet mediante Modbus TCP u OPC UA \cite{iec62541}; en el nivel 3 está la sombra digital; y el nivel 4 recibe las recomendaciones para la gestión del mantenimiento. La sincronización es unidireccional y se hace cada 10 minutos, porque la degradación evoluciona en días y no requiere tiempo real.
+Las propuestas se evaluaron con la VDI 2225 \cite{vdi2225}: cada criterio recibe un peso $g$ y cada propuesta un puntaje $p$ de 0 a 4, donde 4 es la solución ideal. El valor técnico y el económico son la suma de $g \cdot p$ dividida entre el puntaje ideal (Tabla~\ref{tab:vdi}). Los pesos y puntajes son valoraciones del equipo de proyecto, sustentadas en la práctica de auditoría y en las características de cada alternativa.
+
+\begin{table}[htbp]
+\centering
+\caption{Evaluación técnica y económica según la VDI 2225}
+\label{tab:vdi}
+\footnotesize
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{|p{5.4cm}|c|c|c|c|c|}
+\hline
+\textbf{Criterio técnico} & \textbf{$g$} & \textbf{P1} & \textbf{P2} & \textbf{P3} & \textbf{P4} \\ \hline
+Actualización automática & 5 & 0 & 4 & 4 & 0 \\ \hline
+Baja intervención en el equipo & 3 & 3 & 4 & 4 & 1 \\ \hline
+Variables para evaluar la condición & 3 & 1 & 4 & 4 & 2 \\ \hline
+Interoperabilidad & 2 & 1 & 4 & 3 & 1 \\ \hline
+Resolución de los datos & 4 & 4 & 3 & 2 & 4 \\ \hline
+\textbf{Valor técnico} (ideal: 68) & & \textbf{0,44} & \textbf{0,94} & \textbf{0,85} & \textbf{0,40} \\ \hline \hline
+\textbf{Criterio económico} & \textbf{$g$} & \textbf{P1} & \textbf{P2} & \textbf{P3} & \textbf{P4} \\ \hline
+Costo de equipos & 4 & 3 & 3 & 3 & 1 \\ \hline
+Costo por evaluación & 5 & 1 & 4 & 4 & 0 \\ \hline
+\textbf{Valor económico} (ideal: 36) & & \textbf{0,47} & \textbf{0,89} & \textbf{0,89} & \textbf{0,11} \\ \hline
+\end{tabular}
+\end{table}
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{fig_arquitectura_isa95_fotos.pdf}
-\caption{Arquitectura según los niveles de ISA-95. Imágenes: B. S. Elliott (CC BY-SA 4.0), Wikimedia Commons (CC BY-SA 3.0), Laserlicht (CC BY-SA 4.0) y Z22 (CC BY-SA 4.0), vía Wikimedia Commons; tablero: elaboración propia}
+\includegraphics[width=0.5\textwidth]{fig_vdi2225.pdf}
+\caption{Diagrama de evaluación técnico-económica según la VDI 2225}
+\label{fig:vdi}
+\end{figure}
+
+La P2 queda más cerca del punto ideal y de la recta de equilibrio (Figura~\ref{fig:vdi}), por lo que se selecciona. La P3 obtiene el mismo valor económico, pero su resolución de datos depende de un intervalo de envío que no está confirmado. P1 y P4 tienen la mejor resolución, pero exigen una visita en cada evaluación y no se actualizan solas. Al variar al azar los pesos entre 1 y 5 y cada puntaje en un punto, la P2 fue la mejor en el 66\,\% de los casos y la P3 en el resto, por lo que la selección se mantiene frente a cambios moderados en la valoración.
+
+\section{Arquitectura de la solución}
+
+La Figura~\ref{fig:isa95} ubica los componentes de la P2 en los niveles de la IEC 62264. El compresor y su controlador con softPLC, que mantiene la regulación y las protecciones, ocupan los niveles 0 y 1. En el nivel 2, un computador de la sala lee los datos del controlador por Ethernet como cliente OPC UA \cite{iec62541}, cada 2\,s, y guarda el histórico. En el nivel 3 está la sombra digital, y en el nivel 4 sus resultados apoyan las decisiones del cliente y del servicio técnico. El flujo de datos es de un solo sentido: la sombra no envía órdenes al compresor.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig_arquitectura_p2.pdf}
+\caption{Arquitectura de la solución según los niveles de ISA-95. Imágenes: B. S. Elliott (CC BY-SA 4.0), Wikimedia Commons (CC BY-SA 3.0), Laserlicht (CC BY-SA 4.0) y Z22 (CC BY-SA 4.0), vía Wikimedia Commons}
 \label{fig:isa95}
 \end{figure}
 
-\section{Diseño del modelo y del flujo de datos}
+\section{Modelo de la sombra digital}
 
-El flujo sigue las cinco etapas de la ISO 13374. En la \emph{adquisición}, el gateway lee la temperatura de salida del elemento, la temperatura ambiente, la presión de descarga, el estado de carga o descarga y los avisos del controlador. En la \emph{manipulación}, los datos se agregan en ventanas de 10 minutos. En la \emph{detección de estado}, un modelo de comportamiento normal estima la temperatura que debería tener el compresor según las condiciones de operación. Como la temperatura depende de la temperatura ambiente, del tiempo en carga y de la presión, se plantea una regresión lineal, calibrada con 14 días de histórico del equipo:
-\begin{equation}
-\hat{T}_e = \beta_0 + \beta_1\,T_{amb} + \beta_2\,FC + \beta_3\,p
-\label{eq:modelo}
-\end{equation}
-donde $\hat{T}_e$ es la temperatura esperada en °C, $T_{amb}$ la temperatura ambiente, $FC$ la fracción de tiempo en carga en la ventana y $p$ la presión media en bar(g). Se eligió una regresión por ser fácil de explicar y por no requerir datos de fallas.
+El modelo representa el balance de aire entre el compresor, la demanda de la planta y el volumen del tanque y la red. Cuando el compresor está en carga, la presión sube porque entrega más aire del que se consume; en descarga o parada, baja al ritmo del consumo. La velocidad con que sube y baja la presión en cada ciclo permite deducir dos datos que no se miden: el volumen efectivo del sistema y la demanda en cada momento. Esta forma de trabajo coincide con la de las auditorías, en las que el caudal se obtiene de forma indirecta con los datos del fabricante \cite{cac2026}.
 
-La diferencia entre la temperatura medida y la esperada, $r_k = T_{e,k} - \hat{T}_{e,k}$, se suaviza con un promedio móvil exponencial, $D_k = \lambda\, r_k + (1-\lambda)\, D_{k-1}$ con $\lambda = 0{,}02$, para obtener la desviación térmica sostenida. Para el ciclaje se usa el aumento relativo de ciclos de carga por hora respecto al periodo de calibración, $\Delta c = \bar{c}/c_{ref} - 1$. En la \emph{evaluación de salud}, ambos se convierten en subíndices de 0 a 100 y el índice de salud operacional (IHO) lo define el peor de los dos:
-\begin{equation}
-H_T = 100\left[1 - \min\!\left(\max\!\left(\frac{D_k}{12\,\mathrm{K}}, 0\right), 1\right)\right], \quad
-H_C = 100\left[1 - \min\left(\max\left(\Delta c, 0\right), 1\right)\right]
-\end{equation}
-\begin{equation}
-\mathrm{IHO} = \min(H_T, H_C)
-\end{equation}
+La sombra funciona en tres pasos. Primero, se calibra con siete días de datos: estado de carga, presión y caudal de placa. Segundo, reproduce la operación de esa semana para comprobar que el modelo representa al equipo. Tercero, simula escenarios: una demanda adicional, un tanque más grande o el seguimiento semanal del volumen efectivo, que aumenta cuando el compresor pierde caudal. Las alarmas y paradas siguen a cargo del controlador.
 
-En la \emph{recomendación}, un nivel se confirma si se mantiene 6 horas continuas y se asocia con una acción (Tabla~\ref{tab:semaforo}). Una base de reglas expertas añade las causas probables: una temperatura mayor a la esperada apunta al enfriador, la ventilación, el aceite o la válvula termostática; un aumento de ciclos, a la pérdida de capacidad efectiva del sistema, a una banda de presión estrecha o a un cambio en la demanda. Las alarmas y paradas siguen a cargo del controlador.
+No se dispone de datos de un equipo en operación, por lo que la verificación usa datos sintéticos de un compresor de 45\,kW con caudal de placa de 7,6\,m$^3$/min, banda de 6,5 a 7,5\,bar(g) y 9,3\,m$^3$ de volumen. La planta simulada es más compleja que el modelo: incluye fugas que dependen de la presión, un retardo de la válvula de admisión y el paso a parada tras 6 minutos en descarga. Estos valores son supuestos de diseño; en una aplicación real se reemplazan por la ficha técnica, la configuración del controlador y los datos de auditoría del equipo.
 
-\begin{table}[htbp]
-\centering
-\caption{Niveles del índice de salud operacional}
-\label{tab:semaforo}
-\footnotesize
-\renewcommand{\arraystretch}{1.3}
-\begin{tabular}{|p{1.4cm}|p{1.6cm}|p{2.1cm}|p{2.0cm}|p{5.4cm}|}
-\hline
-\textbf{Nivel} & \textbf{IHO} & \textbf{Desviación térmica} & \textbf{Aumento de ciclos} & \textbf{Acción recomendada} \\ \hline
-Verde & 80 o más & menos de 2,4\,K & menos de 20\,\% & Operación normal \\ \hline
-Amarillo & 60--80 & 2,4--4,8\,K & 20--40\,\% & Revisar en la próxima ronda \\ \hline
-Naranja & 40--60 & 4,8--7,2\,K & 40--60\,\% & Programar una inspección \\ \hline
-Rojo & menos de 40 & más de 7,2\,K & más de 60\,\% & Revisión prioritaria antes de una parada \\ \hline
-\end{tabular}
-\end{table}
+\section{Plan de verificación y evaluación del producto}
 
-\section{Origen de los datos y de los parámetros}
-
-No se dispone de datos de un equipo en operación, por lo que la verificación usa datos sintéticos generados en MATLAB con el modelo de la Sección~\ref{sec:sim}. Se generan las mismas variables que registra un controlador de compresor: presión, temperatura de salida del elemento, temperatura ambiente y estado de carga o descarga. Existen conjuntos públicos de datos reales con variables de este tipo, como MetroPT-3, que registra presión, temperatura del aceite, corriente del motor y señales de carga y descarga de la unidad de aire de un tren \cite{metropt3}; estos datos o los registros de una auditoría energética permitirían calibrar la sombra digital en una etapa posterior. La Tabla~\ref{tab:origen} indica el origen de cada parámetro; los que no tienen fuente son supuestos de diseño, que en una aplicación real se reemplazan por la ficha técnica y la configuración del controlador del equipo.
-
-\begin{table}[htbp]
-\centering
-\caption{Origen de los parámetros de la simulación}
-\label{tab:origen}
-\footnotesize
-\renewcommand{\arraystretch}{1.3}
-\begin{tabular}{|p{3.5cm}|p{2.8cm}|p{6.6cm}|}
-\hline
-\textbf{Parámetro} & \textbf{Valor} & \textbf{Origen} \\ \hline
-Regulación del compresor & Carga y descarga entre dos presiones & Modelo de la operación en carga y descarga \cite{liang2019} \\ \hline
-Banda de presión & 6,5 a 7,5\,bar(g) & Supuesto de diseño, dentro de las presiones de trabajo industriales; en MetroPT-3 se documentan umbrales de 7 y 8,2\,bar \cite{metropt3} \\ \hline
-Ciclos de carga por hora & Cerca de 8 por hora & Resultado de la simulación; del orden de los 6 a 8 arranques por hora que se recomienda como criterio de diseño del almacenamiento \cite{marshall2013} \\ \hline
-Escenario de ciclaje & Pérdida de volumen útil & La pérdida de capacidad efectiva, como la que causa la caída de presión en filtros, aumenta los ciclos por hora \cite{marshall2013} \\ \hline
-Temperatura de salida & Ambiente más un incremento en carga y otro en descarga & Calentamiento por compresión; la temperatura del aceite influye en el desempeño \cite{kumar2022}. Los incrementos son supuestos de diseño \\ \hline
-Caudal, volumen de la red, constantes de tiempo, demanda y ruido & Valores típicos & Supuestos de diseño del orden de un compresor de 45\,kW \\ \hline
-Aviso por alta temperatura & 110\,°C & Supuesto; se reemplaza por el valor configurado en el controlador \\ \hline
-\end{tabular}
-\end{table}
-
-\section{Modelo de simulación y plan de verificación}
-\label{sec:sim}
-
-La presión de la red se modela con la regulación por carga y descarga, y la temperatura del elemento como un sistema de primer orden:
-\begin{equation}
-\frac{dp}{dt} = \frac{p_{atm}\,(Q_c - Q_d)}{60\,V}, \qquad
-\frac{dT_e}{dt} = \frac{T_{ss} - T_e}{\tau}
-\end{equation}
-donde $Q_c$ es el caudal del compresor, $Q_d$ la demanda, $V$ el volumen útil de la red, $T_{ss}$ la temperatura de equilibrio y $\tau$ la constante de tiempo. Desde el día 30 se simulan dos degradaciones graduales: un incremento térmico de hasta 30\,K, por pérdida de capacidad del enfriador, y una reducción del volumen útil hasta el 40\,\%.
-
-La verificación evalúa el modelo con datos no usados en su calibración ($R^2$ y RMSE); registra el día en que se confirma cada nivel frente al inicio de la falla y al aviso del controlador; repite el análisis en 10 simulaciones por escenario, más una prueba de robustez con efectos térmicos no incluidos en el modelo; y contrasta los resultados con la Tabla~\ref{tab:req}. La validación con datos reales queda como etapa posterior a este proyecto.
+La verificación compara los resultados de la sombra con los de la planta simulada para cada requerimiento de la Tabla~\ref{tab:req}. Después se evalúa el producto con tres referencias. La clasificación de Kritzinger et al.~\cite{kritzinger2018} distingue el modelo, la sombra y el gemelo digital según el sentido en que fluyen los datos. La tabla periódica de capacidades del Digital Twin Consortium agrupa alrededor de 60 capacidades en seis categorías: servicios de datos, integración, inteligencia, experiencia de usuario, gestión y confiabilidad \cite{dtc_cpt}; se marca cuáles cumple la solución. Finalmente, la Toolbox Industria 4.0 describe cada línea de aplicación de la producción en cinco etapas de desarrollo \cite{vdma2016}; se compara la etapa de la auditoría actual con la que alcanza la sombra digital.
